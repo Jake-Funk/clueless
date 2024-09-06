@@ -1,4 +1,5 @@
 from enum import Enum, IntEnum
+import random
 
 
 class PlayerEnum(str, Enum):
@@ -19,16 +20,16 @@ class WeaponEnum(str, Enum):
     revolver = "revolver"
 
 
-class RoomEnum(IntEnum):
-    study = 0
-    hall = 1
-    lounge = 2
-    library = 3
-    billiard = 4
-    dining = 5
-    conservatory = 6
-    ballroom = 7
-    kitchen = 8
+class RoomEnum(str, Enum):
+    study = "study"
+    hall = "hall"
+    lounge = "lounge"
+    library = "library"
+    billiard = "billiard"
+    dining = "dining"
+    conservatory = "conservatory"
+    ballroom = "ballroom"
+    kitchen = "kitchen"
 
 
 class HallEnum(IntEnum):
@@ -44,3 +45,15 @@ class HallEnum(IntEnum):
     dining_to_kitchen = 9
     conservatory_to_ballroom = 10
     ballroom_to_kitchen = 11
+
+
+class GameSolution:
+    def __init__(self) -> None:
+        self.weapon = random.choice(list(WeaponEnum))
+        self.person = random.choice(list(PlayerEnum))
+        self.room = random.choice(list(RoomEnum))
+
+    def print(self):
+        print("Weapon:", self.weapon.value)
+        print("Person:", self.person.value)
+        print("Room:", self.room.value)
