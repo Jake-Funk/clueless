@@ -21,3 +21,10 @@ jobs:
       - name: Check format
         run: uv run black . --check --verbose
         working-directory: ./server
+
+      - name: Run Tests
+        run: |
+          export PYTHONPATH=$(pwd)
+          export CI=1
+          uv run pytest tests/ --verbose
+        working-directory: ./server
