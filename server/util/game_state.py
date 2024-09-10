@@ -1,8 +1,33 @@
+from enum import Enum
 from util.enums import PlayerEnum, RoomEnum, HallEnum, GameSolution
 from typing import Dict
 from dataclasses import dataclass
 from util.functions import deal_remaining_cards
 from datetime import datetime
+
+
+class TurnPhase(str, Enum):
+    move = "move"
+    suggest = "suggest"
+    accuse = "accuse"
+
+
+@dataclass
+class GameTurn:
+    """
+    This class holds the information for whose turn it is and
+    what phase of their turn it is (move, suggest, accuse)
+    the defaults are set to be how the game starts
+    """
+
+    player: PlayerEnum = PlayerEnum.miss_scarlet
+    phase: TurnPhase = TurnPhase.move
+
+    def print(self, std_out: bool = True) -> str:
+        msg = f"It is {self.player.value}'s turn to {self.phase.value}."
+        if std_out:
+            print(msg)
+        return msg
 
 
 @dataclass
@@ -23,7 +48,7 @@ class GameEvent:
 
 class GameState:
     """
-    This is the core stucture to represent the state of a game of clueless
+    This is the core structure to represent the state of a game of clueless
     the class keeps track of the solution to the game, where everyone is on
     the board, who has what cards, and a log of the game progress.
 
@@ -35,15 +60,13 @@ class GameState:
     """
 
     def __init__(self, num_players: int, solution: GameSolution | None = None):
-        if solution:
-            self.solution = solution
-        else:
-            self.solution = GameSolution()
+        self.solution: GameSolution = solution if solution else GameSolution()
 
         self.player_cards: list[list[str]] = deal_remaining_cards(
             self.solution, num_players
         )
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
+        self.current_turn: GameTurn = GameTurn()
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
