@@ -1,14 +1,5 @@
-from util.enums import RoomEnum, HallEnum
+from util.enums import PlayerEnum, RoomEnum, HallEnum, MoveAction
 
-
-# Example Player Message concept
-message = {
-    "id": 0,
-    "loc": RoomEnum.hall,
-    "next_loc": HallEnum.hall_to_lounge,
-    "suggestion": ("Player", "Location", "Weapon"),
-    "accusation": ("Player", "Location", "Weapon"),
-}
 
 Map = {
     RoomEnum.study: frozenset(
@@ -70,3 +61,23 @@ Map = {
     ),
     HallEnum.ballroom_to_kitchen: frozenset([RoomEnum.ballroom, RoomEnum.kitchen]),
 }
+
+
+def move_player(
+    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: GameState
+) -> str:
+    """
+    Function to move a player in the map within the game state.
+    Removes player from current location and adds them to the new location.
+    Atomized function, no safe guards employed
+
+    Args:
+        movement {MoveAction}: The Move desired by the player
+        current_location {RoomEnum | HallEnum}: Current location of player
+        gs {GameState}: Current state of the game
+
+    Returns:
+        None
+    """
+    gs.map[current_location].remove(movement.player)
+    gs.map[movement.location].extend(movement.player)

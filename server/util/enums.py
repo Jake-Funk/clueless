@@ -1,4 +1,6 @@
 from enum import Enum, IntEnum
+from dataclasses import dataclass
+from pydantic import BaseModel
 import random
 
 
@@ -45,6 +47,13 @@ class HallEnum(IntEnum):
     dining_to_kitchen = 9
     conservatory_to_ballroom = 10
     ballroom_to_kitchen = 11
+
+
+@dataclass
+class MoveAction(BaseModel):
+    id: str = None
+    player: PlayerEnum
+    location: HallEnum | RoomEnum
 
 
 class GameSolution:
