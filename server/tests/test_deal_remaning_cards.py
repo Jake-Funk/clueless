@@ -1,4 +1,4 @@
-from util.functions import deal_remaining_cards
+from util.game_state import deal_remaining_cards
 from util.enums import GameSolution
 import pytest
 
