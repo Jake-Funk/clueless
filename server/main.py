@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 
 from util.game_state import GameState
 from util.enums import MoveAction, HallEnum
-from util.functions import get_current_location
+from util.functions import get_player_location
 from util.movement import Map, move_player
 
 # TODO: Require proper initialization of game state(s) here for
@@ -30,7 +30,7 @@ def move(movement: MoveAction):
         raise HTTPException(status_code=404, detail="Not in the movement phase")
 
     # Check if player can be found on current map
-    current_location = get_current_location(movement.player)
+    current_location = get_player_location(movement.player)
     if current_location is None:
         raise HTTPException(status_code=403, detail="Player not found on Map")
 

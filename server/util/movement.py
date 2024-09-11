@@ -1,5 +1,7 @@
 from util.enums import PlayerEnum, RoomEnum, HallEnum, MoveAction
 
+# from util.game_state import GameState
+
 
 Map = {
     RoomEnum.study: frozenset(
@@ -63,9 +65,7 @@ Map = {
 }
 
 
-def move_player(
-    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: GameState
-) -> str:
+def move_player(movement: MoveAction, current_location: RoomEnum | HallEnum, gs) -> str:
     """
     Function to move a player in the map within the game state.
     Removes player from current location and adds them to the new location.
