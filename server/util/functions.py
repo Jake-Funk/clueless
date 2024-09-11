@@ -1,6 +1,12 @@
 from util.enums import PlayerEnum, WeaponEnum, RoomEnum
 
-def deal_remaining_cards(personSolution: PlayerEnum, weaponSolution: WeaponEnum, roomSolution: RoomEnum, num_players: int) -> list[list[str]]:
+
+def deal_remaining_cards(
+    personSolution: PlayerEnum,
+    weaponSolution: WeaponEnum,
+    roomSolution: RoomEnum,
+    num_players: int,
+) -> list[list[str]]:
     """
     This function will take in a game solution and split all
     remaining cards into a list of n lists according to the number of players, each list

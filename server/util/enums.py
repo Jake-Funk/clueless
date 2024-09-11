@@ -44,6 +44,3 @@ class HallEnum(IntEnum):
     dining_to_kitchen = 9
     conservatory_to_ballroom = 10
     ballroom_to_kitchen = 11
-
-
-

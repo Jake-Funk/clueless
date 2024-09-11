@@ -31,9 +31,10 @@ class GameSolution(BaseModel):
     room to the initializer. These arguments are optional, and If you don't
     pass them in, they will be set as a random value.
     """
-    person: PlayerEnum | None 
-    weapon: WeaponEnum | None 
-    room: RoomEnum | None 
+
+    person: PlayerEnum | None
+    weapon: WeaponEnum | None
+    room: RoomEnum | None
 
     def __init__(
         self,
@@ -63,6 +64,7 @@ class GameState(BaseModel):
     If you leave out the solution argument then a random solution will
     be generated for this game.
     """
+
     # defining attributes at the class level for pydantic base model compatibility
     solution: GameSolution
     map: Dict[RoomEnum | HallEnum, list[PlayerEnum]]
@@ -77,11 +79,11 @@ class GameState(BaseModel):
         else:
             self.solution = GameSolution()
 
-        self.player_cards  = deal_remaining_cards(
-            personSolution = self.solution.person,
-            weaponSolution = self.solution.weapon,
-            roomSolution = self.solution.room,
-            num_players = num_players
+        self.player_cards = deal_remaining_cards(
+            personSolution=self.solution.person,
+            weaponSolution=self.solution.weapon,
+            roomSolution=self.solution.room,
+            num_players=num_players,
         )
         self.player_clues = [[] for _ in range(num_players)]
 
