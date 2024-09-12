@@ -11,11 +11,6 @@ class NewGameRequest(BaseModel):
     num_players: int
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
 @app.post("/new_game")
 async def initialize_game(req: NewGameRequest) -> str:
     try:
