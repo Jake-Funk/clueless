@@ -5,20 +5,31 @@ from util.enums import MoveAction, HallEnum
 from util.functions import get_player_location
 from util.movement import Map, move_player
 
-# TODO: Require proper initialization of game state(s) here for
-# skeleton and minimal systems
-dummy_game_state = GameState(3)
+from pydantic import BaseModel
+import uuid
 
 app = FastAPI()
+games = {}
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+class NewGameRequest(BaseModel):
+    num_players: int
+
+
+@app.post("/new_game")
+async def initialize_game(req: NewGameRequest) -> str:
+    try:
+        temp = GameState(req.num_players)
+    except:
+        raise HTTPException(status_code=403, detail="Invalid number of players.")
+
+    key = str(uuid.uuid4())
+    games[key] = temp
+    return key
 
 
 @app.post("/")
-def move(movement: MoveAction):
+async def move(movement: MoveAction):
     gs = dummy_game_state
     # Check if the Game Id is valid and exists
     # TODO: Need to also validate against the list of available game states
@@ -53,3 +64,4 @@ def move(movement: MoveAction):
         status_code=200,
         detail=f"Successfully moved {movement.player.value} to {movement.location}",
     )
+
