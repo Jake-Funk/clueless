@@ -49,11 +49,31 @@ class HallEnum(IntEnum):
     ballroom_to_kitchen = 11
 
 
+class HttpEnum(IntEnum):
+    bad_request = 400
+    unauthorized = 401
+    forbidden = 403
+    not_found = 404
+    timeout = 408
+    good = 200
+    created = 201
+    accepted = 202
+    no_content = 204
+    internal_error = 500
+
 @dataclass
-class MoveAction(BaseModel):
-    id: str = None
-    player: PlayerEnum
+class MoveAction():
+    """
+    Class to describe a move action from a player
+    """
+    player: PlayerEnum 
     location: HallEnum | RoomEnum
+    id: str | None = None 
+
+    #def __init__(self, player: PlayerEnum, location: HallEnum | RoomEnum, id: str | None = None):
+    #    self.id: str | None = id
+    #    self.player: PlayerEnum = player
+    #    self.location: HallEnum | RoomEnum = location
 
 
 class GameSolution:

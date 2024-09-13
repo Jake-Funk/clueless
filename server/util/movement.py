@@ -1,4 +1,4 @@
-from util.enums import PlayerEnum, RoomEnum, HallEnum, MoveAction
+from util.enums import PlayerEnum, RoomEnum, HallEnum, MoveAction, HttpEnum
 
 # from util.game_state import GameState
 
@@ -65,7 +65,7 @@ Map = {
 }
 
 
-def move_player(movement: MoveAction, current_location: RoomEnum | HallEnum, gs) -> str:
+def move_player(movement: MoveAction, current_location: RoomEnum | HallEnum, gs) -> None:
     """
     Function to move a player in the map within the game state.
     Removes player from current location and adds them to the new location.
@@ -74,10 +74,44 @@ def move_player(movement: MoveAction, current_location: RoomEnum | HallEnum, gs)
     Args:
         movement {MoveAction}: The Move desired by the player
         current_location {RoomEnum | HallEnum}: Current location of player
-        gs {GameState}: Current state of the game
+        gs {GameState}: Dictionary of game states
 
     Returns:
         None
     """
     gs.map[current_location].remove(movement.player)
-    gs.map[movement.location].extend(movement.player)
+    gs.map[movement.location].append(movement.player)
+
+def validate_move(movement: MoveAction, current_location: RoomEnum | HallEnum, gs: dict) -> HttpEnum:
+    """
+    Function to validate the desired move of a Player 
+    using the modified clue rule set
+
+    Args:
+        movement {MoveAction}: The Move desired by the player
+        current_location {RoomEnum | HallEnum}: Current location of player
+        gs {Dict{GameState}}: Dictionary of game states
+
+    Returns:
+        A HttpEnum value indicating validity of desired movement
+    """
+    key = movement.id
+
+    # Check if the game key is avaiable
+    if key == None or key not in gs.keys():
+        return HttpEnum.not_found
+
+    # Check if the turn is for movement
+    if gs[key].current_turn.phase != "move":
+        return HttpEnum.bad_request
+
+    # Check if desired location is adjacent to the current location
+    if movement.location not in Map[current_location]:
+        return HttpEnum.bad_request
+
+    # Check if desired location is a Hallway and if that hallway is occupied
+    if isinstance(movement.location, HallEnum) and len(gs[key].map[movement.location]) >= 1:
+        return HttpEnum.bad_request 
+
+    # Great Success!
+    return HttpEnum.good

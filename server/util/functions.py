@@ -17,4 +17,4 @@ def get_player_location(player: PlayerEnum, gs: GameState) -> RoomEnum | HallEnu
     for location in gs.map:
         if player in gs.map[location]:
             return location
-    return None
+    raise Exception("Player not found.", player.value)
