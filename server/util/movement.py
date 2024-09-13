@@ -76,7 +76,7 @@ def move_player(
     Args:
         movement {MoveAction}: The Move desired by the player
         current_location {RoomEnum | HallEnum}: Current location of player
-        gs {GameState}: Dictionary of game states
+        gs {GameState}: Current game state
 
     Returns:
         None
@@ -86,7 +86,7 @@ def move_player(
 
 
 def validate_move(
-    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: dict
+    movement: MoveAction, current_location: RoomEnum | HallEnum, gs
 ) -> HttpEnum:
     """
     Function to validate the desired move of a Player
@@ -95,19 +95,13 @@ def validate_move(
     Args:
         movement {MoveAction}: The Move desired by the player
         current_location {RoomEnum | HallEnum}: Current location of player
-        gs {Dict{GameState}}: Dictionary of game states
+        gs {GameState}: Current game state
 
     Returns:
         A HttpEnum value indicating validity of desired movement
     """
-    key = movement.id
-
-    # Check if the game key is avaiable
-    if key == None or key not in gs.keys():
-        return HttpEnum.not_found
-
     # Check if the turn is for movement
-    if gs[key].current_turn.phase != "move":
+    if gs.current_turn.phase != "move":
         return HttpEnum.bad_request
 
     # Check if desired location is adjacent to the current location
@@ -115,10 +109,7 @@ def validate_move(
         return HttpEnum.bad_request
 
     # Check if desired location is a Hallway and if that hallway is occupied
-    if (
-        isinstance(movement.location, HallEnum)
-        and len(gs[key].map[movement.location]) >= 1
-    ):
+    if isinstance(movement.location, HallEnum) and len(gs.map[movement.location]) >= 1:
         return HttpEnum.bad_request
 
     # Great Success!

@@ -36,6 +36,9 @@ async def move(movement: MoveAction):
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
+    if movement.id not in games.keys():
+        raise HTTPException(status_code=404, detail="Game not found.")
+
     http_code = validate_move(movement, current_location, games)
 
     if http_code == HttpEnum.not_found:
