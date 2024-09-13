@@ -65,7 +65,9 @@ Map = {
 }
 
 
-def move_player(movement: MoveAction, current_location: RoomEnum | HallEnum, gs) -> None:
+def move_player(
+    movement: MoveAction, current_location: RoomEnum | HallEnum, gs
+) -> None:
     """
     Function to move a player in the map within the game state.
     Removes player from current location and adds them to the new location.
@@ -82,9 +84,12 @@ def move_player(movement: MoveAction, current_location: RoomEnum | HallEnum, gs)
     gs.map[current_location].remove(movement.player)
     gs.map[movement.location].append(movement.player)
 
-def validate_move(movement: MoveAction, current_location: RoomEnum | HallEnum, gs: dict) -> HttpEnum:
+
+def validate_move(
+    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: dict
+) -> HttpEnum:
     """
-    Function to validate the desired move of a Player 
+    Function to validate the desired move of a Player
     using the modified clue rule set
 
     Args:
@@ -110,8 +115,11 @@ def validate_move(movement: MoveAction, current_location: RoomEnum | HallEnum, g
         return HttpEnum.bad_request
 
     # Check if desired location is a Hallway and if that hallway is occupied
-    if isinstance(movement.location, HallEnum) and len(gs[key].map[movement.location]) >= 1:
-        return HttpEnum.bad_request 
+    if (
+        isinstance(movement.location, HallEnum)
+        and len(gs[key].map[movement.location]) >= 1
+    ):
+        return HttpEnum.bad_request
 
     # Great Success!
     return HttpEnum.good

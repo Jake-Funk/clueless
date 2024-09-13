@@ -45,7 +45,8 @@ async def move(movement: MoveAction):
     elif http_code == HttpEnum.good:
         gs[movement.id].current_turn.phase = "suggest"
         move_player(movement, current_location, gs)
-        return {"Response": f"Successfully moved {movement.player.value} to {movement.location}"}
+        return {
+            "Response": f"Successfully moved {movement.player.value} to {movement.location}"
+        }
     else:
-       raise HTTPException(status_code=500, detail="Internal server error occurred.")
-
+        raise HTTPException(status_code=500, detail="Internal server error occurred.")

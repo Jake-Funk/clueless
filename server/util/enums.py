@@ -61,16 +61,18 @@ class HttpEnum(IntEnum):
     no_content = 204
     internal_error = 500
 
+
 @dataclass
-class MoveAction():
+class MoveAction:
     """
     Class to describe a move action from a player
     """
-    player: PlayerEnum 
-    location: HallEnum | RoomEnum
-    id: str | None = None 
 
-    #def __init__(self, player: PlayerEnum, location: HallEnum | RoomEnum, id: str | None = None):
+    player: PlayerEnum
+    location: HallEnum | RoomEnum
+    id: str | None = None
+
+    # def __init__(self, player: PlayerEnum, location: HallEnum | RoomEnum, id: str | None = None):
     #    self.id: str | None = id
     #    self.player: PlayerEnum = player
     #    self.location: HallEnum | RoomEnum = location

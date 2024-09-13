@@ -1,15 +1,15 @@
 from util.functions import get_player_location
 from util.game_state import GameState
-from util.enums import PlayerEnum, HallEnum, RoomEnum, MoveAction
-from util.movement import move_player
-from tests.data.move_actions import MOVES
+from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum, MoveAction
+from util.movement import move_player, validate_move
+from tests.data.move_actions import MOVES, DUMMY_MOVE_ID
 import pytest
 
 
 @pytest.mark.parametrize("player", list(PlayerEnum))
 def test_get_player_default_locations(player: int):
     """
-    Test to gaurantee that the get_player_location 
+    Test to gaurantee that the get_player_location
     function works using the default game state
     """
     default_gs = GameState(6)
@@ -31,28 +31,100 @@ def test_get_player_default_locations(player: int):
     else:
         assert False, "Not a valid player"
 
+
 def test_move_player():
     """
+    Test to check that the move_player function removes
+    the player from the old location and adds them to
+    the new location
     """
     default_gs = GameState(6)
-    player  = PlayerEnum.prof_plum
+    player = PlayerEnum.prof_plum
 
     assert player in default_gs.map[HallEnum.study_to_lib], "Control check"
 
-    # Move plum to study 
+    # Move plum to study
     move_player(MOVES[2], HallEnum.study_to_lib, default_gs)
-    assert player not in default_gs.map[HallEnum.study_to_lib], "Player in original location"
+    assert (
+        player not in default_gs.map[HallEnum.study_to_lib]
+    ), "Player in original location"
     assert player in default_gs.map[RoomEnum.study], "Player not in study after move"
 
-    # Move plum to kitchen 
+    # Move plum to kitchen
     move_player(MOVES[3], RoomEnum.study, default_gs)
     assert player not in default_gs.map[RoomEnum.study], "Player in original location"
-    assert player in default_gs.map[RoomEnum.kitchen], "Player not in kitchen after move"
+    assert (
+        player in default_gs.map[RoomEnum.kitchen]
+    ), "Player not in kitchen after move"
 
     # Move plum to dining to kitchen hallway
     move_player(MOVES[4], RoomEnum.kitchen, default_gs)
     assert player not in default_gs.map[RoomEnum.kitchen], "Player in original location"
-    assert player in default_gs.map[HallEnum.dining_to_kitchen], "Player not in hallway after move"
+    assert (
+        player in default_gs.map[HallEnum.dining_to_kitchen]
+    ), "Player not in hallway after move"
 
 
+def test_validate_move_with_plum_moves():
+    """
+    Test which moves player professor plum around in various
+    states to check the conditions of validate_player are
+    correct.
+    """
+    gs_dict = {DUMMY_MOVE_ID: GameState(6)}
+    default_gs = gs_dict[DUMMY_MOVE_ID]
+    player = PlayerEnum.prof_plum
 
+    # Check move with bad ID
+    bad_move = MoveAction(player, RoomEnum.study, DUMMY_MOVE_ID + "1")
+    assert validate_move(bad_move, HallEnum.study_to_lib, gs_dict) == HttpEnum.not_found
+
+    # Check valid move to study
+    assert validate_move(MOVES[2], HallEnum.study_to_lib, gs_dict) == HttpEnum.good
+    move_player(MOVES[2], HallEnum.study_to_lib, default_gs)
+
+    # Check bad non-adjacent moves
+    assert validate_move(MOVES[0], RoomEnum.study, gs_dict) == HttpEnum.bad_request
+    assert validate_move(MOVES[1], RoomEnum.study, gs_dict) == HttpEnum.bad_request
+
+    # Check valid move to kitchen
+    assert validate_move(MOVES[3], RoomEnum.study, gs_dict) == HttpEnum.good
+    move_player(MOVES[3], RoomEnum.study, default_gs)
+
+    # Check valid move to unoccupied hallway
+    assert validate_move(MOVES[4], RoomEnum.kitchen, gs_dict) == HttpEnum.good
+
+
+def test_validate_move_with_green_moves():
+    """
+    Test which moves player mr green around to check
+    that moving in an occupied hallway leads to a
+    bad request being returned
+    """
+    gs_dict = {DUMMY_MOVE_ID: GameState(6)}
+    default_gs = gs_dict[DUMMY_MOVE_ID]
+    player = PlayerEnum.mr_green
+
+    # Check valid move to ballroom
+    assert (
+        validate_move(MOVES[5], HallEnum.conservatory_to_ballroom, gs_dict)
+        == HttpEnum.good
+    )
+    move_player(MOVES[5], HallEnum.conservatory_to_ballroom, default_gs)
+
+    # Check bad move to occupied hallway
+    assert validate_move(MOVES[6], RoomEnum.ballroom, gs_dict) == HttpEnum.bad_request
+
+
+def test_validate_move_on_different_turn_phase():
+    """
+    Test to make sure a bad request is returned when
+    trying to move in the wrong phase of the turn
+    """
+    gs_dict = {DUMMY_MOVE_ID: GameState(6)}
+    gs_dict[DUMMY_MOVE_ID].current_turn.phase = "suggest"
+
+    # Check valid move when not in correct phase
+    assert (
+        validate_move(MOVES[2], HallEnum.study_to_lib, gs_dict) == HttpEnum.bad_request
+    )
