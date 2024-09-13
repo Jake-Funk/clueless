@@ -72,11 +72,6 @@ class MoveAction:
     location: HallEnum | RoomEnum
     id: str | None = None
 
-    # def __init__(self, player: PlayerEnum, location: HallEnum | RoomEnum, id: str | None = None):
-    #    self.id: str | None = id
-    #    self.player: PlayerEnum = player
-    #    self.location: HallEnum | RoomEnum = location
-
 
 class GameSolution:
     """
