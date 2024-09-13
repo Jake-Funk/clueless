@@ -36,20 +36,14 @@ async def move(movement: MoveAction):
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
-    if movement.id not in games.keys():
+    if movement.id == None or movement.id not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
 
     http_code = validate_move(movement, current_location, games)
 
-    if http_code == HttpEnum.not_found:
-        raise HTTPException(status_code=404, detail="Game not found.")
-    elif http_code == HttpEnum.bad_request:
-        raise HTTPException(status_code=400, detail="Invalid move")
-    elif http_code == HttpEnum.good:
-        gs[movement.id].current_turn.phase = "suggest"
-        move_player(movement, current_location, gs)
+    if http_code[0] == HttpEnum.good:
         return {
             "Response": f"Successfully moved {movement.player.value} to {movement.location}"
         }
     else:
-        raise HTTPException(status_code=500, detail="Internal server error occurred.")
+        raise HTTPException(status_code=http_code[0].value, detail=http_code[1])

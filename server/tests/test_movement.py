@@ -74,19 +74,25 @@ def test_validate_move_with_plum_moves():
     default_gs = GameState(6)
 
     # Check valid move to study
-    assert validate_move(MOVES[2], HallEnum.study_to_lib, default_gs) == HttpEnum.good
+    assert (
+        validate_move(MOVES[2], HallEnum.study_to_lib, default_gs)[0] == HttpEnum.good
+    )
     move_player(MOVES[2], HallEnum.study_to_lib, default_gs)
 
     # Check bad non-adjacent moves
-    assert validate_move(MOVES[0], RoomEnum.study, default_gs) == HttpEnum.bad_request
-    assert validate_move(MOVES[1], RoomEnum.study, default_gs) == HttpEnum.bad_request
+    assert (
+        validate_move(MOVES[0], RoomEnum.study, default_gs)[0] == HttpEnum.bad_request
+    )
+    assert (
+        validate_move(MOVES[1], RoomEnum.study, default_gs)[0] == HttpEnum.bad_request
+    )
 
     # Check valid move to kitchen
-    assert validate_move(MOVES[3], RoomEnum.study, default_gs) == HttpEnum.good
+    assert validate_move(MOVES[3], RoomEnum.study, default_gs)[0] == HttpEnum.good
     move_player(MOVES[3], RoomEnum.study, default_gs)
 
     # Check valid move to unoccupied hallway
-    assert validate_move(MOVES[4], RoomEnum.kitchen, default_gs) == HttpEnum.good
+    assert validate_move(MOVES[4], RoomEnum.kitchen, default_gs)[0] == HttpEnum.good
 
 
 def test_validate_move_with_green_moves():
@@ -99,14 +105,15 @@ def test_validate_move_with_green_moves():
 
     # Check valid move to ballroom
     assert (
-        validate_move(MOVES[5], HallEnum.conservatory_to_ballroom, default_gs)
+        validate_move(MOVES[5], HallEnum.conservatory_to_ballroom, default_gs)[0]
         == HttpEnum.good
     )
     move_player(MOVES[5], HallEnum.conservatory_to_ballroom, default_gs)
 
     # Check bad move to occupied hallway
     assert (
-        validate_move(MOVES[6], RoomEnum.ballroom, default_gs) == HttpEnum.bad_request
+        validate_move(MOVES[6], RoomEnum.ballroom, default_gs)[0]
+        == HttpEnum.bad_request
     )
 
 
@@ -120,6 +127,6 @@ def test_validate_move_on_different_turn_phase():
 
     # Check valid move when not in correct phase
     assert (
-        validate_move(MOVES[2], HallEnum.study_to_lib, default_gs)
+        validate_move(MOVES[2], HallEnum.study_to_lib, default_gs)[0]
         == HttpEnum.bad_request
     )

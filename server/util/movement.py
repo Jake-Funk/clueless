@@ -87,7 +87,7 @@ def move_player(
 
 def validate_move(
     movement: MoveAction, current_location: RoomEnum | HallEnum, gs
-) -> HttpEnum:
+) -> tuple:
     """
     Function to validate the desired move of a Player
     using the modified clue rule set
@@ -98,19 +98,20 @@ def validate_move(
         gs {GameState}: Current game state
 
     Returns:
-        A HttpEnum value indicating validity of desired movement
+        A tuple of a HttpEnum value indicating validity of desired movement,
+        and a string error message
     """
     # Check if the turn is for movement
     if gs.current_turn.phase != "move":
-        return HttpEnum.bad_request
+        return (HttpEnum.bad_request, "Wrong phase of the game to perform a move.")
 
     # Check if desired location is adjacent to the current location
     if movement.location not in Map[current_location]:
-        return HttpEnum.bad_request
+        return (HttpEnum.bad_request, "Invalid location to move to.")
 
     # Check if desired location is a Hallway and if that hallway is occupied
     if isinstance(movement.location, HallEnum) and len(gs.map[movement.location]) >= 1:
-        return HttpEnum.bad_request
+        return (HttpEnum.bad_request, "Cannot move to an occupied hallway.")
 
     # Great Success!
-    return HttpEnum.good
+    return (HttpEnum.good, "")
