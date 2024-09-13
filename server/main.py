@@ -38,10 +38,17 @@ async def move(movement: MoveAction):
 
     if movement.id == None or movement.id not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
+    key = movement.id
 
-    http_code = validate_move(movement, current_location, games)
+    http_code = validate_move(movement, current_location, games[key])
 
     if http_code[0] == HttpEnum.good:
+        move_player(movement, current_location, games[key])
+        # Check if player entered a room
+        if isinstance(movement.location, RoomEnum):
+            games[key].current_phase.turn = "suggest"
+        # TODO: If not a room, need to keep turn as move but change
+        # game player to be the next one. Would like utility function for this
         return {
             "Response": f"Successfully moved {movement.player.value} to {movement.location}"
         }
