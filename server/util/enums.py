@@ -1,5 +1,4 @@
 from enum import Enum, IntEnum
-import random
 
 
 class PlayerEnum(str, Enum):
@@ -45,28 +44,3 @@ class HallEnum(IntEnum):
     dining_to_kitchen = 9
     conservatory_to_ballroom = 10
     ballroom_to_kitchen = 11
-
-
-class GameSolution:
-    """
-    The game solution class is just a structure for keeping tabs on a
-    game's correct answer. If you want the solution to have specific values
-    for test/debug purposes, then you can pass in a person, weapon, and/or
-    room to the initializer. These arguments are optional, and If you don't
-    pass them in, they will be set as a random value.
-    """
-
-    def __init__(
-        self,
-        person: PlayerEnum | None = None,
-        weapon: WeaponEnum | None = None,
-        room: RoomEnum | None = None,
-    ) -> None:
-        self.weapon = weapon if weapon else random.choice(list(WeaponEnum))
-        self.person = person if person else random.choice(list(PlayerEnum))
-        self.room = room if room else random.choice(list(RoomEnum))
-
-    def print(self):
-        print("Weapon:", self.weapon.value)
-        print("Person:", self.person.value)
-        print("Room:", self.room.value)
