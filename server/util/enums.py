@@ -1,4 +1,7 @@
 from enum import Enum, IntEnum
+from dataclasses import dataclass
+from pydantic import BaseModel
+import random
 
 
 class PlayerEnum(str, Enum):
@@ -44,3 +47,27 @@ class HallEnum(IntEnum):
     dining_to_kitchen = 9
     conservatory_to_ballroom = 10
     ballroom_to_kitchen = 11
+
+
+class HttpEnum(IntEnum):
+    bad_request = 400
+    unauthorized = 401
+    forbidden = 403
+    not_found = 404
+    timeout = 408
+    good = 200
+    created = 201
+    accepted = 202
+    no_content = 204
+    internal_error = 500
+
+
+@dataclass
+class MoveAction:
+    """
+    Class to describe a move action from a player
+    """
+
+    player: PlayerEnum
+    location: HallEnum | RoomEnum
+    id: str | None = None

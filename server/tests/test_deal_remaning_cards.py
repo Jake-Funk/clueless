@@ -1,4 +1,4 @@
-from util.game_state import GameState
+from util.game_state import GameState, GameSolution
 import pytest
 
 
