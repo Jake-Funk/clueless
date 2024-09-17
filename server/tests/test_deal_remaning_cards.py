@@ -1,22 +1,23 @@
-from util.functions import deal_remaining_cards
+from util.game_state import GameState
 from util.enums import GameSolution
 import pytest
 
 
 @pytest.mark.parametrize("num_players", [-1, 0, 1, 7])
 def test_num_players(num_players: int):
-    sol = GameSolution()
+    dummy_game = GameState(6)
 
     # if given invalid input the function should raise a ValueError
     with pytest.raises(ValueError):
-        deal_remaining_cards(sol, num_players)
+        hands = dummy_game.deal_remaining_cards(num_players)
 
 
 @pytest.mark.parametrize("num_players", range(2, 7))
 def test_hands_dealt(num_players: int):
-    sol = GameSolution()
+    dummy_game = GameState(6)
 
-    hands = deal_remaining_cards(sol, num_players)
+    hands = dummy_game.deal_remaining_cards(num_players)
+    sol = dummy_game.solution
 
     # check that the function generated the right number of hands
     assert len(hands) == num_players
