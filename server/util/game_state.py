@@ -1,15 +1,41 @@
 from enum import Enum
-from util.enums import PlayerEnum, RoomEnum, HallEnum, GameSolution
+from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum
 from typing import Dict
 from dataclasses import dataclass
 from util.functions import deal_remaining_cards
 from datetime import datetime
+import random
 
 
 class TurnPhase(str, Enum):
     move = "move"
     suggest = "suggest"
     accuse = "accuse"
+
+
+class GameSolution:
+    """
+    The game solution class is just a structure for keeping tabs on a
+    game's correct answer. If you want the solution to have specific values
+    for test/debug purposes, then you can pass in a person, weapon, and/or
+    room to the initializer. These arguments are optional, and If you don't
+    pass them in, they will be set as a random value.
+    """
+
+    def __init__(
+        self,
+        person: PlayerEnum | None = None,
+        weapon: WeaponEnum | None = None,
+        room: RoomEnum | None = None,
+    ) -> None:
+        self.weapon = weapon if weapon else random.choice(list(WeaponEnum))
+        self.person = person if person else random.choice(list(PlayerEnum))
+        self.room = room if room else random.choice(list(RoomEnum))
+
+    def print(self):
+        print("Weapon:", self.weapon.value)
+        print("Person:", self.person.value)
+        print("Room:", self.room.value)
 
 
 @dataclass
@@ -63,7 +89,7 @@ class GameState:
         self.solution: GameSolution = solution if solution else GameSolution()
 
         self.player_cards: list[list[str]] = deal_remaining_cards(
-            self.solution, num_players
+            self.solution.person, self.solution.weapon, self.solution.room, num_players
         )
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()

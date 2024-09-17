@@ -1,7 +1,9 @@
-from util.enums import GameSolution, PlayerEnum, WeaponEnum, RoomEnum
+from util.enums import PlayerEnum, WeaponEnum, RoomEnum
 
 
-def deal_remaining_cards(solution: GameSolution, num_players: int) -> list[list[str]]:
+def deal_remaining_cards(
+    solPlayer: PlayerEnum, solWeapon: WeaponEnum, solRoom: RoomEnum, num_players: int
+) -> list[list[str]]:
     """
     This function will take in a game solution and split all
     remaining cards into a list of n lists according to the number of players, each list
@@ -16,13 +18,13 @@ def deal_remaining_cards(solution: GameSolution, num_players: int) -> list[list[
 
     # creating the lists of remaining items
     remaining_people = list(PlayerEnum)
-    remaining_people.remove(solution.person)
+    remaining_people.remove(solPlayer)
 
     remaining_weapons = list(WeaponEnum)
-    remaining_weapons.remove(solution.weapon)
+    remaining_weapons.remove(solWeapon)
 
     remaining_rooms = list(RoomEnum)
-    remaining_rooms.remove(solution.room)
+    remaining_rooms.remove(solRoom)
 
     # deal all reamaing items to players in order
     player_hands = [[] for _ in range(num_players)]

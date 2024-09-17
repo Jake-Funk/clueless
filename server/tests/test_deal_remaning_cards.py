@@ -1,5 +1,5 @@
 from util.functions import deal_remaining_cards
-from util.enums import GameSolution
+from util.game_state import GameSolution
 import pytest
 
 
@@ -9,14 +9,14 @@ def test_num_players(num_players: int):
 
     # if given invalid input the function should raise a ValueError
     with pytest.raises(ValueError):
-        deal_remaining_cards(sol, num_players)
+        deal_remaining_cards(sol.person, sol.weapon, sol.room, num_players)
 
 
 @pytest.mark.parametrize("num_players", range(2, 7))
 def test_hands_dealt(num_players: int):
     sol = GameSolution()
 
-    hands = deal_remaining_cards(sol, num_players)
+    hands = deal_remaining_cards(sol.person, sol.weapon, sol.room, num_players)
 
     # check that the function generated the right number of hands
     assert len(hands) == num_players
