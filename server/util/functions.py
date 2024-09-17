@@ -1,4 +1,4 @@
-from util.enums import GameSolution, PlayerEnum, WeaponEnum, RoomEnum, HallEnum
+from util.enums import PlayerEnum, WeaponEnum, RoomEnum, HallEnum
 from util.game_state import GameState
 
 
