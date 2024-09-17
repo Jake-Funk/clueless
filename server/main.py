@@ -28,7 +28,7 @@ async def initialize_game(req: NewGameRequest) -> str:
     return key
 
 
-@app.post("/")
+@app.post("/move")
 async def move(movement: MoveAction):
     # Check if player can be found on current map
     if movement.id == None or movement.id not in games.keys():
