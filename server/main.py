@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState
 from util.enums import MoveAction, HallEnum, RoomEnum, HttpEnum
@@ -9,7 +10,21 @@ from pydantic import BaseModel
 import uuid
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",  # this origin should be removed from PROD but for our purposes its no big deal
+    "https://clueless-eight.vercel.app",
+]
+
 games = {}
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class NewGameRequest(BaseModel):
