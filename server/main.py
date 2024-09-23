@@ -62,8 +62,9 @@ async def move(movement: MoveAction):
         # Check if player entered a room
         if isinstance(movement.location, RoomEnum):
             games[key].current_turn.phase = "suggest"
-        # TODO: If not a room, need to keep turn as move but change
-        # game player to be the next one. Would like utility function for this
+        else:
+            games[key].next_player()
+
         return {
             "Response": f"Successfully moved {movement.player.value} to {movement.location.value}"
         }

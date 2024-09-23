@@ -146,3 +146,22 @@ class GameState:
             i += 1
 
         return player_hands
+
+    def next_player(self) -> None:
+        """
+        Change the current turn's player to the next one
+        """
+        if self.current_turn.player == PlayerEnum.miss_scarlet:
+            self.current_turn.player = PlayerEnum.prof_plum
+        elif self.current_turn.player == PlayerEnum.prof_plum:
+            self.current_turn.player = PlayerEnum.mr_green
+        elif self.current_turn.player == PlayerEnum.mr_green:
+            self.current_turn.player = PlayerEnum.mrs_white
+        elif self.current_turn.player == PlayerEnum.mrs_white:
+            self.current_turn.player = PlayerEnum.mrs_peacock
+        elif self.current_turn.player == PlayerEnum.mrs_peacock:
+            self.current_turn.player = PlayerEnum.col_mustard
+        elif self.current_turn.player == PlayerEnum.col_mustard:
+            self.current_turn.player = PlayerEnum.miss_scarlet
+        else:
+            raise Exception("Encountered an Invalid Player")
