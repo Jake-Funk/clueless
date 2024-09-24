@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException
 
-from util.game_state import GameState
+from util.game_state import GameState, GameEvent
 from util.enums import MoveAction, HallEnum, RoomEnum, HttpEnum
 from util.functions import get_player_location
 from util.movement import Map, move_player, validate_move
-
 from pydantic import BaseModel
+
 import uuid
 
 app = FastAPI()
@@ -54,3 +54,27 @@ async def move(movement: MoveAction):
         }
     else:
         raise HTTPException(status_code=http_code[0].value, detail=http_code[1])
+
+
+@app.post("/State")
+async def gameState(gameKey: str) -> dict:
+    """
+    Function to get the game state. For now this is assuming that the game state endpoint will work for everybody
+    """
+    # Check if the requester has the required access to get the game state
+    # TODO
+
+    # check to see if there are active games to query
+    if not games:
+        raise HTTPException(status_code=503, detail="No games available")
+
+    # get the current game state from the requested game key
+    if gameKey not in games.keys():
+        # if there are keys and if the requested key doesn't match, throw an exception
+        raise HTTPException(status_code=404, detail="unknown game key")
+    else:
+        # if there are no games throw an exception
+        currentGame = games[gameKey]
+
+    # convert the GameState into a dict of strings and return it
+    return currentGame.dump_to_dict()
