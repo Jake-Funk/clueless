@@ -9,22 +9,22 @@ def test_next_player():
     """
     gs = GameState(6)
 
-    assert gs.current_turn.player == PlayerEnum.miss_scarlet
+    assert gs.get_current_player() == PlayerEnum.miss_scarlet
 
     gs.next_player()
-    assert gs.current_turn.player == PlayerEnum.prof_plum
+    assert gs.get_current_player() == PlayerEnum.prof_plum
 
     gs.next_player()
-    assert gs.current_turn.player == PlayerEnum.mr_green
+    assert gs.get_current_player() == PlayerEnum.mr_green
 
     gs.next_player()
-    assert gs.current_turn.player == PlayerEnum.mrs_white
+    assert gs.get_current_player() == PlayerEnum.mrs_white
 
     gs.next_player()
-    assert gs.current_turn.player == PlayerEnum.mrs_peacock
+    assert gs.get_current_player() == PlayerEnum.mrs_peacock
 
     gs.next_player()
-    assert gs.current_turn.player == PlayerEnum.col_mustard
+    assert gs.get_current_player() == PlayerEnum.col_mustard
 
     gs.next_player()
-    assert gs.current_turn.player == PlayerEnum.miss_scarlet
+    assert gs.get_current_player() == PlayerEnum.miss_scarlet

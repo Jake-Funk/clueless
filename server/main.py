@@ -60,6 +60,8 @@ async def move(movement: MoveAction):
     if http_code[0] == HttpEnum.good:
         move_player(movement, current_location, games[key])
         # Check if player entered a room
+        # If they have, move the game phase to suggestion
+        # Otherwise keep the same phase but change players
         if isinstance(movement.location, RoomEnum):
             games[key].current_turn.phase = "suggest"
         else:
