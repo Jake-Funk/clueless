@@ -146,3 +146,24 @@ class GameState:
             i += 1
 
         return player_hands
+
+    def dump_to_dict(self) -> dict:
+        """
+        Member function that pushes all attributes to a dict for return
+        """
+        outputDict = {}
+
+        # Solution information
+        outputDict["solution"] = {}
+        outputDict["solution"]["killer"] = self.solution.person
+        outputDict["solution"]["weapon"] = self.solution.weapon
+        outputDict["solution"]["room"] = self.solution.room
+
+        # player cards
+        for i, card_list in enumerate(self.player_cards):
+            currentPlayer = "player" + str(i + 1)
+            outputDict[currentPlayer] = card_list
+
+        outputDict["map"] = self.map
+
+        return outputDict
