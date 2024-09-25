@@ -4,7 +4,6 @@ from typing import Dict
 from dataclasses import dataclass
 from datetime import datetime
 import random
-from pydantic import BaseModel
 
 
 class TurnPhase(str, Enum):

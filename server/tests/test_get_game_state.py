@@ -6,7 +6,7 @@ from util.game_state import GameState
 def test_num_players(num_players: int):
     dummy_game = GameState(num_players)
 
-    # make sure that teh dump_to_dict works in the valid range
+    # make sure that the dump_to_dict function works in the valid range
     dummyDict = dummy_game.dump_to_dict()
 
     # check that the correct number of players got created
