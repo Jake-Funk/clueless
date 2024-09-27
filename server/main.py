@@ -9,6 +9,11 @@ from util.movement import Map, move_player, validate_move
 from pydantic import BaseModel
 import uuid
 
+# TODO: Potentially use this for our logging system?
+import logging
+
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+
 app = FastAPI()
 
 origins = [
@@ -64,8 +69,13 @@ async def move(movement: MoveAction):
         # Otherwise keep the same phase but change players
         if isinstance(movement.location, RoomEnum):
             games[key].current_turn.phase = "suggest"
+            logging.info(f"Moving {movement.player.value} to {movement.location.value}")
+            logging.info(f"{movement.player.value} can now make a suggestion")
         else:
             games[key].next_player()
+            logging.info(
+                f"{movement.player.value} moved to a Hallway, going to next player"
+            )
 
         return {
             "Response": f"Successfully moved {movement.player.value} to {movement.location.value}"
