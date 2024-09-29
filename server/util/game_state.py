@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime
 import random
 
+PLAYERS = [player for player in PlayerEnum]
+
 
 class TurnPhase(str, Enum):
     move = "move"
@@ -45,7 +47,7 @@ class GameTurn:
     the defaults are set to be how the game starts
     """
 
-    player: PlayerEnum = PlayerEnum.miss_scarlet
+    player: int = 0  # Index into the PLAYERS list, 0 is miss scarlet
     phase: TurnPhase = TurnPhase.move
 
     def print(self, std_out: bool = True) -> str:
@@ -90,6 +92,10 @@ class GameState:
         self.player_cards: list[list[str]] = self.deal_remaining_cards(num_players)
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
+        # TODO: Assigning players arbitrarily as in the below line will work for
+        # the minimal increment but will need to support player chosen characters
+        # for the target increment.
+        self.avail_players = PLAYERS[:num_players]
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
@@ -146,6 +152,21 @@ class GameState:
             i += 1
 
         return player_hands
+
+    def next_player(self) -> None:
+        """
+        Atomic function to change the current turn's player to the next one
+        """
+        self.current_turn.player += 1
+
+        if self.current_turn.player >= len(self.avail_players):
+            self.current_turn.player = 0
+
+    def get_current_player(self) -> PlayerEnum:
+        """
+        Utility function to get the current player of the game
+        """
+        return self.avail_players[self.current_turn.player]
 
     def dump_to_dict(self) -> dict:
         """
