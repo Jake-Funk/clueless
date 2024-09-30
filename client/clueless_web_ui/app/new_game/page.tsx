@@ -1,5 +1,5 @@
-"use client"
-import { Button } from "@/components/ui/button"
+"use client";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -7,31 +7,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Github } from "lucide-react"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Github } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 const formSchema = z.object({
   numPlayers: z.coerce
     .number()
     .min(2, { message: "You need at least 2 people to play" })
     .max(6, { message: "You can only play with up to 6 players." }),
-})
+});
 
 export default function Home() {
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       numPlayers: 2,
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // ✅ This will be type-safe and validated.
@@ -44,17 +44,17 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ num_players: values.numPlayers }),
-      }
-    )
-    const content = await rawResp.json()
+      },
+    );
+    const content = await rawResp.json();
 
-    console.log(content)
+    console.log(content);
     try {
-      localStorage.setItem("gameID", content)
+      localStorage.setItem("gameID", content);
     } catch {
-      console.error("Err adding the game ID to local storage")
+      console.error("Err adding the game ID to local storage");
     } finally {
-      router.push("/play")
+      router.push("/play");
     }
   }
 
@@ -117,5 +117,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Github } from "lucide-react"
-import Image from "next/image"
+"use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Github } from "lucide-react";
+import Image from "next/image";
 import {
   Form,
   FormControl,
@@ -10,27 +10,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useState } from "react"
+} from "@/components/ui/form";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useState } from "react";
 
 const formSchema = z.object({
   id: z.coerce.string().uuid("Not a valid game ID"),
-})
+});
 
 export default function Home() {
-  const router = useRouter()
-  const [err, setErr] = useState(false)
+  const router = useRouter();
+  const [err, setErr] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // ✅ This will be type-safe and validated.
@@ -42,20 +42,20 @@ export default function Home() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-      }
-    )
+      },
+    );
     if (rawResp.status == 200) {
-      const content = await rawResp.json()
+      const content = await rawResp.json();
 
-      console.log(content)
+      console.log(content);
       try {
-        localStorage.setItem("gameID", values.id)
-        router.push("/play")
+        localStorage.setItem("gameID", values.id);
+        router.push("/play");
       } catch {
-        console.error("Err adding the game ID to local storage")
+        console.error("Err adding the game ID to local storage");
       }
     } else {
-      setErr(true)
+      setErr(true);
     }
   }
 
@@ -79,7 +79,12 @@ export default function Home() {
                 <FormItem>
                   <FormLabel className="m-auto">Game ID</FormLabel>
                   <FormControl>
-                    <Input {...field} onFocus={()=>{setErr(false)}}/>
+                    <Input
+                      {...field}
+                      onFocus={() => {
+                        setErr(false);
+                      }}
+                    />
                   </FormControl>
                   {err ? (
                     <FormMessage>
@@ -124,5 +129,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  )
+  );
 }
