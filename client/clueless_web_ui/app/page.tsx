@@ -1,22 +1,22 @@
-"use client";
-import { BadgePlus, Github, Search, UserRoundPlus } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+"use client"
+import { BadgePlus, Github, Search, UserRoundPlus } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export default function Home() {
-  const [iconClasses, setIconClasses] = useState("fill-background");
-  const router = useRouter();
+  const [iconClasses, setIconClasses] = useState("fill-background")
+  const router = useRouter()
 
   function handleClick(e: React.MouseEvent<HTMLElement>, route: string) {
-    e.preventDefault();
+    e.preventDefault()
     setIconClasses(
-      "fill-background animate-out ease-in zoom-out-[150] duration-1.5s fill-mode-forwards",
-    );
+      "fill-background animate-out ease-in zoom-out-[150] duration-1.5s fill-mode-forwards"
+    )
     setTimeout(() => {
-      router.push(route);
-    }, 1500);
+      router.push(route)
+    }, 1500)
   }
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] overflow-hidden">
@@ -85,5 +85,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  );
+  )
 }

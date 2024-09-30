@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Github } from "lucide-react"
 import Image from "next/image"
-// import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -24,7 +24,7 @@ const formSchema = z.object({
 })
 
 export default function Home() {
-//   const [gameCode, setGameCode] = useState("")
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,7 +34,6 @@ export default function Home() {
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
     // ✅ This will be type-safe and validated.
     const rawResp = await fetch(
       "https://clueless-server-915069415929.us-east1.run.app/new_game",
@@ -50,7 +49,13 @@ export default function Home() {
     const content = await rawResp.json()
 
     console.log(content)
-    console.log(values)
+    try {
+      localStorage.setItem("gameID", content)
+    } catch {
+      console.error("Err adding the game ID to local storage")
+    } finally {
+      router.push("/play")
+    }
   }
 
   return (

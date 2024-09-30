@@ -1,9 +1,64 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Github } from "lucide-react";
-import Image from "next/image";
+"use client"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Github } from "lucide-react"
+import Image from "next/image"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import { useRouter } from "next/navigation"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { useState } from "react"
+
+const formSchema = z.object({
+  id: z.coerce.string().uuid("Not a valid game ID"),
+})
 
 export default function Home() {
+  const router = useRouter()
+  const [err, setErr] = useState(false)
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      id: "",
+    },
+  })
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // ✅ This will be type-safe and validated.
+    const rawResp = await fetch(
+      `https://clueless-server-915069415929.us-east1.run.app/State?gameKey=${values.id}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
+    if (rawResp.status == 200) {
+      const content = await rawResp.json()
+
+      console.log(content)
+      try {
+        localStorage.setItem("gameID", values.id)
+        router.push("/play")
+      } catch {
+        console.error("Err adding the game ID to local storage")
+      }
+    } else {
+      setErr(true)
+    }
+  }
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] animate-in ease-in-out zoom-in-0 duration-1000">
       <main className="flex flex-col gap-8 row-start-2 items-center justify-center sm:items-start ">
@@ -12,9 +67,35 @@ export default function Home() {
             Enter the game code to join:
           </h1>
         </div>
-
-        <Input className="w-1/2 m-auto sm:w-auto" />
-        <Button className="m-auto">Join Game</Button>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col m-auto"
+          >
+            <FormField
+              control={form.control}
+              name="id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="m-auto">Game ID</FormLabel>
+                  <FormControl>
+                    <Input {...field} onFocus={()=>{setErr(false)}}/>
+                  </FormControl>
+                  {err ? (
+                    <FormMessage>
+                      This server did not find this game ID.
+                    </FormMessage>
+                  ) : (
+                    <FormMessage />
+                  )}
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="m-3">
+              Join Game
+            </Button>
+          </form>
+        </Form>
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
@@ -43,5 +124,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  );
+  )
 }
