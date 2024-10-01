@@ -1,12 +1,16 @@
-"use client";
-import { Github } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+"use client"
+import { Github } from "lucide-react"
+import Image from "next/image"
+import { useEffect, useState } from "react"
 
 export default function Home() {
-  const value = localStorage.getItem("gameID") || "";
-  const [gameID] = useState(value);
-  const [gameState, setGameState] = useState({});
+  const [gameID, setGameId] = useState("")
+  const [gameState, setGameState] = useState({})
+
+  useEffect(() => {
+    const value = localStorage.getItem("gameID") || ""
+    setGameId(value)
+  }, [])
 
   useEffect(() => {
     async function getGameState() {
@@ -18,15 +22,15 @@ export default function Home() {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-        },
-      );
-      const content = await rawResp.json();
-      setGameState(content);
+        }
+      )
+      const content = await rawResp.json()
+      setGameState(content)
     }
     if (gameID) {
-      getGameState();
+      getGameState()
     }
-  }, [gameID]);
+  }, [gameID])
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] overflow-hidden">
@@ -71,5 +75,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  );
+  )
 }
