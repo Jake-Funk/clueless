@@ -91,6 +91,13 @@ class GameState:
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
 
+        self.player_character_mapping: Dict[str, PlayerEnum] = {}
+        allCharacters = list(PlayerEnum)
+        for i in range(num_players):
+            randCharacter = random.choice(allCharacters)
+            self.player_character_mapping["player" + str(i + 1)] = randCharacter
+            allCharacters.remove(randCharacter)
+
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
             self.map[item] = []
@@ -158,6 +165,8 @@ class GameState:
         outputDict["solution"]["killer"] = self.solution.person
         outputDict["solution"]["weapon"] = self.solution.weapon
         outputDict["solution"]["room"] = self.solution.room
+
+        outputDict["player_character_mapping"] = self.player_character_mapping
 
         # player cards
         for i, card_list in enumerate(self.player_cards):

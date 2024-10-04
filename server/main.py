@@ -6,6 +6,7 @@ from util.enums import MoveAction, HallEnum, RoomEnum, HttpEnum
 from util.functions import get_player_location
 from util.movement import Map, move_player, validate_move
 from pydantic import BaseModel
+import random
 
 import uuid
 
@@ -29,6 +30,17 @@ app.add_middleware(
 
 class NewGameRequest(BaseModel):
     num_players: int
+
+
+class Statement(BaseModel):
+    """
+    Class that will act as an input format for suggestions and accusations
+    TODO: conform this to the Enums defined in enums.py (would require pydantic for those classes)
+    """
+
+    person: str
+    weapon: str
+    room: str
 
 
 @app.post("/new_game")
@@ -93,3 +105,72 @@ async def gameState(gameKey: str) -> dict:
 
     # convert the GameState into a dict of strings and return it
     return currentGame.dump_to_dict()
+
+
+@app.post("/suggestion")
+async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) -> str:
+    """
+    Function that accepts suggestions from a player, verifies they can be made,
+    and returns the first card from the players following the player who suggested
+    which disproves the suggestion
+
+    Args:
+        gameKey: string representing the game key for the game which the suggestion is made
+        suggestor: the player making the suggestion
+        suggestion: the suggestion they are making (player, weapon, and room)
+    """
+    # get the game state information
+    if gameKey not in games.keys():
+        # if there are keys and if the requested key doesn't match, throw an exception
+        raise HTTPException(status_code=404, detail="unknown game key")
+    else:
+        currentGame = games[gameKey]
+
+    # dump to dictionary format
+    currentGameDict = currentGame.dump_to_dict()
+
+    # first ensure the suggestor is in the same room as the suggestion they are making
+    # Satisfies game requirement
+    try:
+        # get the character represented by the current player
+        playersCharacter = currentGameDict["player_character_mapping"][suggestor]
+    except:
+        raise HTTPException(status_code=404, detail="Suggestor is unknown to the game")
+
+    # search in the map for the location of that player
+    for loc in currentGameDict["map"].keys():
+        if playersCharacter in currentGameDict["map"][loc]:
+            characterLocation = loc
+
+    # get the location of the current player
+    if characterLocation != suggestion.room:
+        # TODO: This exception is necessary once the players can actually make suggestions - to test it will be commented out
+        print("Exception will be raised here, but is commented out for now")
+
+        # raise HTTPException(status_code=403, detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made")
+
+    # will need a way to relate the suggestor to the players in the game (i.e., their place in the order of the game)
+    # this allows us to pick the next player to look at for cards
+    playersList = list(currentGameDict["player_character_mapping"].keys())
+    loopIdx = playersList.index(suggestor)
+
+    # create a list of players that can be used to find the next player whose cards should be checked
+    top = playersList[:loopIdx]
+    bottom = playersList[loopIdx:]
+    playersList = bottom[1:] + top
+
+    # loop through the players in order and check their cards against the suggestion
+    for p in playersList:
+        # TODO: Future iterations should send a request out to the identified player to show a card if one of the suggestions is in their hand
+        playerCards = currentGameDict[p]
+
+        # select the cards that
+        overlapCards = [
+            c
+            for c in playerCards
+            if c in suggestion.person or c in suggestion.weapon or c in suggestion.room
+        ]
+
+        if overlapCards:
+            # if there are any overlapping cards, return one of them randomly
+            return f"{p} shows {random.choice(overlapCards)}"
