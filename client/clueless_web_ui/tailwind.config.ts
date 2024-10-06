@@ -57,6 +57,9 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animationDuration: {
+        "1.5s": "1.5s",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

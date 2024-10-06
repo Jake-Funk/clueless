@@ -36,7 +36,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="fixed top-0 right-0 flex flex-row-reverse m-3 w-auto">
+          <div className="fixed top-0 right-0 flex flex-row-reverse m-3 w-auto z-10">
             <ModeToggle />
           </div>
           {children}
