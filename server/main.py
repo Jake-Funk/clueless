@@ -107,7 +107,7 @@ async def gameState(gameKey: str) -> dict:
     return currentGame.dump_to_dict()
 
 
-@app.post("/suggestion")
+@app.post("/suggestion",status_code=200)
 async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) -> str:
     """
     Function that accepts suggestions from a player, verifies they can be made,
@@ -135,7 +135,7 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
         # get the character represented by the current player
         playersCharacter = currentGameDict["player_character_mapping"][suggestor]
     except:
-        raise HTTPException(status_code=404, detail="Suggestor is unknown to the game")
+        raise HTTPException(status_code=204, detail="Suggestor is unknown to the game")
 
     # search in the map for the location of that player
     for loc in currentGameDict["map"].keys():
@@ -174,3 +174,8 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
         if overlapCards:
             # if there are any overlapping cards, return one of them randomly
             return f"{p} shows {random.choice(overlapCards)}"
+
+    # if you get out of the loop that means there are no cards to show
+    # this should happen when the exact solution is found or when every card in 
+    # the suggesstion is in the players hand
+    raise HTTPException(status_code=404, detail="None of the other players have these suggested cards - Are they in your hand?")
