@@ -107,7 +107,7 @@ async def gameState(gameKey: str) -> dict:
     return currentGame.dump_to_dict()
 
 
-@app.post("/suggestion",status_code=200)
+@app.post("/suggestion", status_code=200)
 async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) -> str:
     """
     Function that accepts suggestions from a player, verifies they can be made,
@@ -176,6 +176,9 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
             return f"{p} shows {random.choice(overlapCards)}"
 
     # if you get out of the loop that means there are no cards to show
-    # this should happen when the exact solution is found or when every card in 
+    # this should happen when the exact solution is found or when every card in
     # the suggesstion is in the players hand
-    raise HTTPException(status_code=404, detail="None of the other players have these suggested cards - Are they in your hand?")
+    raise HTTPException(
+        status_code=404,
+        detail="None of the other players have these suggested cards - Are they in your hand?",
+    )
