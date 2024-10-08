@@ -137,7 +137,7 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
 
     # Ensure the suggestor is in the same room as the suggestion they are making
     # Satisfies game requirement
-    if get_player_location(playersCharacter,currentGame) != suggestion.room:
+    if get_player_location(playersCharacter, currentGame) != suggestion.room:
         # TODO: This exception is necessary once the players can actually make suggestions - to test it will be commented out
         print("Exception will be raised here, but is commented out for now")
         # raise HTTPException(status_code=403, detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made")

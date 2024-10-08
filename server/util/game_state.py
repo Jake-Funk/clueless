@@ -84,14 +84,21 @@ class GameState:
     be generated for this game.
     """
 
-    def __init__(self, num_players: int, solution: GameSolution | None = None, player_character_mapping: Dict[str, PlayerEnum] | None = None):
+    def __init__(
+        self,
+        num_players: int,
+        solution: GameSolution | None = None,
+        player_character_mapping: Dict[str, PlayerEnum] | None = None,
+    ):
         self.solution: GameSolution = solution if solution else GameSolution()
 
         self.player_cards: list[list[str]] = self.deal_remaining_cards(num_players)
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
 
-        self.player_character_mapping: Dict[str, PlayerEnum] = player_character_mapping if player_character_mapping else {}
+        self.player_character_mapping: Dict[str, PlayerEnum] = (
+            player_character_mapping if player_character_mapping else {}
+        )
         allCharacters = list(PlayerEnum)
         for i in range(num_players):
             randCharacter = random.choice(allCharacters)
