@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState, GameEvent
-from util.enums import MoveAction, HallEnum, RoomEnum, HttpEnum
+from util.enums import MoveAction, HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum
 from util.functions import get_player_location
 from util.movement import Map, move_player, validate_move
 from pydantic import BaseModel
@@ -38,9 +38,9 @@ class Statement(BaseModel):
     TODO: conform this to the Enums defined in enums.py (would require pydantic for those classes)
     """
 
-    person: str
-    weapon: str
-    room: str
+    person: PlayerEnum
+    weapon: WeaponEnum
+    room: RoomEnum
 
 
 @app.post("/new_game")
@@ -129,24 +129,17 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
     # dump to dictionary format
     currentGameDict = currentGame.dump_to_dict()
 
-    # first ensure the suggestor is in the same room as the suggestion they are making
-    # Satisfies game requirement
     try:
         # get the character represented by the current player
         playersCharacter = currentGameDict["player_character_mapping"][suggestor]
     except:
         raise HTTPException(status_code=204, detail="Suggestor is unknown to the game")
 
-    # search in the map for the location of that player
-    for loc in currentGameDict["map"].keys():
-        if playersCharacter in currentGameDict["map"][loc]:
-            characterLocation = loc
-
-    # get the location of the current player
-    if characterLocation != suggestion.room:
+    # Ensure the suggestor is in the same room as the suggestion they are making
+    # Satisfies game requirement
+    if get_player_location(playersCharacter,currentGame) != suggestion.room:
         # TODO: This exception is necessary once the players can actually make suggestions - to test it will be commented out
         print("Exception will be raised here, but is commented out for now")
-
         # raise HTTPException(status_code=403, detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made")
 
     # will need a way to relate the suggestor to the players in the game (i.e., their place in the order of the game)
