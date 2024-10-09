@@ -38,9 +38,14 @@ class Statement(BaseModel):
     TODO: conform this to the Enums defined in enums.py (would require pydantic for those classes)
     """
 
-    person: PlayerEnum
-    weapon: WeaponEnum
-    room: RoomEnum
+    class Details(BaseModel):
+        person: PlayerEnum
+        weapon: WeaponEnum
+        room: RoomEnum
+
+    gameKey: str | None
+    player: str | None
+    statementDetails: Details | None
 
 
 @app.post("/new_game")
@@ -108,7 +113,7 @@ async def gameState(gameKey: str) -> dict:
 
 
 @app.post("/suggestion", status_code=200)
-async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) -> str:
+async def makeSuggestion(playerSuggestion: Statement) -> dict:
     """
     Function that accepts suggestions from a player, verifies they can be made,
     and returns the first card from the players following the player who suggested
@@ -119,10 +124,43 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
         suggestor: the player making the suggestion
         suggestion: the suggestion they are making (player, weapon, and room)
     """
+
+    # specify internal variable details
+    suggestor: str
+    gameKey: str
+    suggestion: Statement.Details
+    returnDict = {
+        "response": PlayerEnum | RoomEnum | WeaponEnum | None,
+        "player": str | None,
+    }
+
+    # exceptions for unprovided data
+    if not playerSuggestion.player:
+        raise HTTPException(
+            status_code=HttpEnum.bad_request,
+            detail="player making suggestion is unspecified",
+        )
+    else:
+        suggestor = playerSuggestion.player
+
+    if not playerSuggestion.gameKey:
+        raise HTTPException(
+            status_code=HttpEnum.bad_request, detail="gameKey unspecified"
+        )
+    else:
+        gameKey = playerSuggestion.gameKey
+
+    if not playerSuggestion.statementDetails:
+        raise HTTPException(
+            status_code=HttpEnum.bad_request, detail="suggestion details unspecified"
+        )
+    else:
+        suggestion = playerSuggestion.statementDetails
+
     # get the game state information
     if gameKey not in games.keys():
         # if there are keys and if the requested key doesn't match, throw an exception
-        raise HTTPException(status_code=404, detail="unknown game key")
+        raise HTTPException(status_code=HttpEnum.not_found, detail="unknown game key")
     else:
         currentGame = games[gameKey]
 
@@ -133,14 +171,33 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
         # get the character represented by the current player
         playersCharacter = currentGameDict["player_character_mapping"][suggestor]
     except:
-        raise HTTPException(status_code=204, detail="Suggestor is unknown to the game")
+        raise HTTPException(
+            status_code=HttpEnum.not_found, detail="Suggestor is unknown to the game"
+        )
 
     # Ensure the suggestor is in the same room as the suggestion they are making
     # Satisfies game requirement
     if get_player_location(playersCharacter, currentGame) != suggestion.room:
         # TODO: This exception is necessary once the players can actually make suggestions - to test it will be commented out
-        print("Exception will be raised here, but is commented out for now")
-        # raise HTTPException(status_code=403, detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made")
+        raise HTTPException(
+            status_code=HttpEnum.forbidden,
+            detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made",
+        )
+
+    # move the target player to the suggested room
+    # get current room
+    movingPlayerCurrentLocation = get_player_location(suggestion.person, currentGame)
+    # create a move object of the suggestion movement
+    forcedMove = MoveAction(player=suggestion.person, location=suggestion.room)
+    # execute move
+    move_player(
+        movement=forcedMove,
+        current_location=movingPlayerCurrentLocation,
+        gs=currentGame,
+    )
+
+    # after move update the game state dictionary
+    currentGameDict = currentGame.dump_to_dict()
 
     # will need a way to relate the suggestor to the players in the game (i.e., their place in the order of the game)
     # this allows us to pick the next player to look at for cards
@@ -166,12 +223,11 @@ async def makeSuggestion(gameKey: str, suggestor: str, suggestion: Statement) ->
 
         if overlapCards:
             # if there are any overlapping cards, return one of them randomly
-            return f"{p} shows {random.choice(overlapCards)}"
+            returnDict["response"] = random.choice(overlapCards)
+            returnDict["player"] = p
+            # break loop immediately once an overlapping card is found
+            break
 
-    # if you get out of the loop that means there are no cards to show
-    # this should happen when the exact solution is found or when every card in
-    # the suggesstion is in the players hand
-    raise HTTPException(
-        status_code=404,
-        detail="None of the other players have these suggested cards - Are they in your hand?",
-    )
+    # change game turn phase
+    currentGame.current_turn.phase = "accuse"
+    return returnDict
