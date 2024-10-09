@@ -92,10 +92,10 @@ class GameState:
         self.player_cards: list[list[str]] = self.deal_remaining_cards(num_players)
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
-        # TODO: Assigning players arbitrarily as in the below line will work for
-        # the minimal increment but will need to support player chosen characters
-        # for the target increment.
+        # TODO: Conform the avail_players with Michael Changes
         self.avail_players = PLAYERS[:num_players]
+        # TODO: Conform the moveable_players for Michael's changes
+        self.moveable_players = set(list(range(num_players)))
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):

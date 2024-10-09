@@ -71,3 +71,12 @@ class MoveAction:
     player: PlayerEnum
     location: HallEnum | RoomEnum
     id: str | None = None
+
+
+@dataclass
+class AccuseAction:
+    """Class to describe an accusation action from the player"""
+
+    id: str | None = None
+    suggestor: str | None = None
+    statement: Statement | None = None  # TODO: Acquire from Michael's class
