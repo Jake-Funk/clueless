@@ -1,7 +1,7 @@
 from util.functions import get_player_location
 from util.game_state import GameState
 from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum, MoveAction
-from util.movement import move_player, validate_move
+from util.movement import move_player, validate_move, does_possible_move_exist
 from tests.data.move_actions import MOVES, DUMMY_MOVE_ID
 import pytest
 
@@ -130,3 +130,21 @@ def test_validate_move_on_different_turn_phase():
         validate_move(MOVES[2], HallEnum.study_to_lib, default_gs)[0]
         == HttpEnum.bad_request
     )
+
+
+def test_possible_move_exist():
+    """
+    Simple check to validate the does_possible_move_exist function
+    """
+    default_gs = GameState(6)
+
+    # Assert a valid move exists
+    assert does_possible_move_exist(HallEnum.conservatory_to_ballroom, default_gs)
+
+    default_gs.map[RoomEnum.conservatory] = PlayerEnum.mrs_white
+    # Assert a valid move exists
+    assert does_possible_move_exist(RoomEnum.conservatory, default_gs)
+
+    default_gs.map[HallEnum.billiard_to_ballroom] = PlayerEnum.prof_plum
+    # Assert no possible move exists
+    assert not does_possible_move_exist(RoomEnum.ballroom, default_gs)

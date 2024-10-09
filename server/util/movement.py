@@ -115,3 +115,27 @@ def validate_move(
 
     # Great Success!
     return (HttpEnum.good, "")
+
+
+def does_possible_move_exist(current_location: RoomEnum | HallEnum, gs) -> bool:
+    """
+    Function to check if there is a valid move possible at the current location
+    and given game state
+    """
+    hall_count = 0
+    player_count = 0
+    for location in Map[current_location]:
+        if type(location) is HallEnum:
+            hall_count += 1
+        if gs.map[location]:
+            player_count += 1
+
+    # If the adjacent locations are not all Hallways return True
+    if hall_count != len(Map[current_location]):
+        return True
+    # Otherwise check if all adjacent hallways are occupied
+    else:
+        if player_count != len(Map[current_location]):
+            return True
+        else:
+            return False
