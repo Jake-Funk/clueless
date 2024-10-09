@@ -121,6 +121,9 @@ def does_possible_move_exist(current_location: RoomEnum | HallEnum, gs) -> bool:
     """
     Function to check if there is a valid move possible at the current location
     and given game state
+
+    Returns:
+        True if a possible move exists, False otherwise
     """
     hall_count = 0
     player_count = 0
