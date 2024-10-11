@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from util.game_state import GameState, GameEvent
 from util.enums import MoveAction, HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum
 from util.functions import get_player_location
-from util.movement import Map, move_player, validate_move
+from util.movement import Map, move_player, validate_move, does_possible_move_exist
 from pydantic import BaseModel
 import random
 
@@ -77,6 +77,11 @@ async def move(movement: MoveAction):
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
+    if not does_possible_move_exist(current_location, games[key]):
+        games[key].next_player()
+        logger.info("No possible move available. Transitioning to next player.")
+        return {"Response": f"No valid move available. Moving to next Player."}
+
     http_code = validate_move(movement, current_location, games[key])
 
     if http_code[0] == HttpEnum.good:
@@ -95,7 +100,7 @@ async def move(movement: MoveAction):
             )
 
         return {
-            "Response": f"Successfully moved {movement.player.value} to {movement.location.value}"
+            "Response": f"Successfully moved {movement.player.value} to {movement.location.value}. Moving to next Player."
         }
     else:
         raise HTTPException(status_code=http_code[0].value, detail=http_code[1])
