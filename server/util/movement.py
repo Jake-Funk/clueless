@@ -1,3 +1,4 @@
+from util.game_state import GameState
 from util.enums import PlayerEnum, RoomEnum, HallEnum, MoveAction, HttpEnum
 
 # from util.game_state import GameState
@@ -66,7 +67,7 @@ Map = {
 
 
 def move_player(
-    movement: MoveAction, current_location: RoomEnum | HallEnum, gs
+    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: GameState
 ) -> None:
     """
     Function to move a player in the map within the game state.
@@ -86,7 +87,7 @@ def move_player(
 
 
 def validate_move(
-    movement: MoveAction, current_location: RoomEnum | HallEnum, gs
+    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: GameState
 ) -> tuple:
     """
     Function to validate the desired move of a Player
@@ -117,7 +118,9 @@ def validate_move(
     return (HttpEnum.good, "")
 
 
-def does_possible_move_exist(current_location: RoomEnum | HallEnum, gs) -> bool:
+def does_possible_move_exist(
+    current_location: RoomEnum | HallEnum, gs: GameState
+) -> bool:
     """
     Function to check if there is a valid move possible at the current location
     and given game state
@@ -134,6 +137,7 @@ def does_possible_move_exist(current_location: RoomEnum | HallEnum, gs) -> bool:
             player_count += 1
 
     # If the adjacent locations are not all Hallways return True
+    # A secret Passageway counts as an adjacent room not hallway
     if hall_count != len(Map[current_location]):
         return True
     # Otherwise check if all adjacent hallways are occupied
