@@ -86,7 +86,12 @@ class GameState:
     be generated for this game.
     """
 
-    def __init__(self, num_players: int, solution: GameSolution | None = None):
+    def __init__(
+        self,
+        num_players: int,
+        solution: GameSolution | None = None,
+        player_character_mapping: Dict[str, PlayerEnum] | None = None,
+    ):
         self.solution: GameSolution = solution if solution else GameSolution()
 
         self.player_cards: list[list[str]] = self.deal_remaining_cards(num_players)
@@ -96,6 +101,15 @@ class GameState:
         self.avail_players = PLAYERS[:num_players]
         # TODO: Conform the moveable_players for Michael's changes
         self.moveable_players = set(list(range(num_players)))
+
+        self.player_character_mapping: Dict[str, PlayerEnum] = (
+            player_character_mapping if player_character_mapping else {}
+        )
+        allCharacters = list(PlayerEnum)
+        for i in range(num_players):
+            randCharacter = random.choice(allCharacters)
+            self.player_character_mapping["player" + str(i + 1)] = randCharacter
+            allCharacters.remove(randCharacter)
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
@@ -179,6 +193,8 @@ class GameState:
         outputDict["solution"]["killer"] = self.solution.person
         outputDict["solution"]["weapon"] = self.solution.weapon
         outputDict["solution"]["room"] = self.solution.room
+
+        outputDict["player_character_mapping"] = self.player_character_mapping
 
         # player cards
         for i, card_list in enumerate(self.player_cards):
