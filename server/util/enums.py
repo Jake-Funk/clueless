@@ -60,23 +60,3 @@ class HttpEnum(IntEnum):
     accepted = 202
     no_content = 204
     internal_error = 500
-
-
-@dataclass
-class MoveAction:
-    """
-    Class to describe a move action from a player
-    """
-
-    player: PlayerEnum
-    location: HallEnum | RoomEnum
-    id: str | None = None
-
-
-@dataclass
-class AccuseAction:
-    """Class to describe an accusation action from the player"""
-
-    id: str | None = None
-    suggestor: str | None = None
-    statement: Statement | None = None  # TODO: Acquire from Michael's class

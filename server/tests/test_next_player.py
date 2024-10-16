@@ -9,22 +9,22 @@ def test_next_player():
     """
     gs = GameState(6)
 
-    assert gs.get_current_player() == PlayerEnum.miss_scarlet
+    assert gs.get_current_player() == gs.player_order[0]
 
     gs.next_player()
-    assert gs.get_current_player() == PlayerEnum.prof_plum
+    assert gs.get_current_player() == gs.player_order[1]
 
     gs.next_player()
-    assert gs.get_current_player() == PlayerEnum.mr_green
+    assert gs.get_current_player() == gs.player_order[2]
 
     gs.next_player()
-    assert gs.get_current_player() == PlayerEnum.mrs_white
+    assert gs.get_current_player() == gs.player_order[3]
 
     gs.next_player()
-    assert gs.get_current_player() == PlayerEnum.mrs_peacock
+    assert gs.get_current_player() == gs.player_order[4]
 
     gs.next_player()
-    assert gs.get_current_player() == PlayerEnum.col_mustard
+    assert gs.get_current_player() == gs.player_order[5]
 
     gs.next_player()
-    assert gs.get_current_player() == PlayerEnum.miss_scarlet
+    assert gs.get_current_player() == gs.player_order[0]

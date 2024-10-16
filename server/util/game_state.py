@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from datetime import datetime
 import random
 
-PLAYERS = [player for player in PlayerEnum]
-
 
 class TurnPhase(str, Enum):
     move = "move"
@@ -97,24 +95,30 @@ class GameState:
         self.player_cards: list[list[str]] = self.deal_remaining_cards(num_players)
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
-        # TODO: Conform the avail_players with Michael Changes
-        self.avail_players = PLAYERS[:num_players]
-        # TODO: Conform the moveable_players for Michael's changes
-        self.moveable_players = set(list(range(num_players)))
 
+        # TODO: This will need an update to proper player IDs
+        self.moveable_players = []  # For tracking what players can still play
+        self.player_order = []  # For tracking player order
+
+        # Mapping player ids to game characters
         self.player_character_mapping: Dict[str, PlayerEnum] = (
             player_character_mapping if player_character_mapping else {}
         )
         allCharacters = list(PlayerEnum)
         for i in range(num_players):
             randCharacter = random.choice(allCharacters)
-            self.player_character_mapping["player" + str(i + 1)] = randCharacter
+            player_id = "player" + str(i + 1)
+            self.player_character_mapping[player_id] = randCharacter
             allCharacters.remove(randCharacter)
+
+            self.moveable_players.append(player_id)
+            self.player_order.append(player_id)
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
             self.map[item] = []
 
+        # Starting Player locations
         self.map[HallEnum.hall_to_lounge] = [PlayerEnum.miss_scarlet]
         self.map[HallEnum.lounge_to_dining] = [PlayerEnum.col_mustard]
         self.map[HallEnum.ballroom_to_kitchen] = [PlayerEnum.mrs_white]
@@ -173,14 +177,14 @@ class GameState:
         """
         self.current_turn.player += 1
 
-        if self.current_turn.player >= len(self.avail_players):
+        if self.current_turn.player >= len(self.player_order):
             self.current_turn.player = 0
 
     def get_current_player(self) -> PlayerEnum:
         """
         Utility function to get the current player of the game
         """
-        return self.avail_players[self.current_turn.player]
+        return self.player_order[self.current_turn.player]
 
     def dump_to_dict(self) -> dict:
         """
