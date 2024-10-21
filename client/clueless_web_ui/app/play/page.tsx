@@ -1,79 +1,92 @@
-"use client"
-import { Github } from "lucide-react"
-import Image from "next/image"
-import { useEffect, useState } from "react"
+"use client";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Board } from "@/components/board";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { createContext, useEffect, useState } from "react";
 
+const defaultGameState = {
+  player_character_mapping: {},
+  map: {
+    study: [],
+    hall: [],
+    lounge: [],
+    library: [],
+    billiard: [],
+    dining: [],
+    conservatory: [],
+    ballroom: [],
+    kitchen: [],
+    0: "",
+    1: "",
+    2: "",
+    3: "",
+    4: "",
+    5: "",
+    6: "",
+    7: "",
+    8: "",
+    9: "",
+    10: "",
+    11: "",
+  },
+};
+
+export const GameStateContext = createContext({
+  gameState: defaultGameState,
+  player: "",
+  gameID: "",
+});
 export default function Home() {
-  const [gameID, setGameId] = useState("")
-  const [gameState, setGameState] = useState({})
+  const [gameID, setGameId] = useState("");
+  const [player, setPlayer] = useState("");
+  const [gameState, setGameState] = useState(defaultGameState);
 
   useEffect(() => {
-    const value = localStorage.getItem("gameID") || ""
-    setGameId(value)
-  }, [])
+    const value = localStorage.getItem("gameID") || "";
+    setGameId(value);
+
+    const playerNo = localStorage.getItem("player") || "";
+    setPlayer(playerNo);
+  }, []);
 
   useEffect(() => {
     async function getGameState() {
       const rawResp = await fetch(
-        `https://clueless-server-915069415929.us-east1.run.app/State?gameKey=${gameID}`,
+        process.env.NEXT_PUBLIC_SERVER_URL + `/State?gameKey=${gameID}`,
         {
           method: "POST",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-        }
-      )
-      const content = await rawResp.json()
-      setGameState(content)
+        },
+      );
+      const content = await rawResp.json();
+      setGameState(content);
     }
     if (gameID) {
-      getGameState()
+      getGameState();
     }
-  }, [gameID])
+  }, [gameID]);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] overflow-hidden">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <div className="flex items-center gap-4">
-          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-5xl">
-            Your Game ID:
-          </h1>
-        </div>
-        <div>{gameID}</div>
-        <div className="flex items-center gap-4">
-          <h1 className="scroll-m-20 text-2xl font-bold tracking-tight lg:text-5xl">
-            Game State:
-          </h1>
-        </div>
-        <pre>{JSON.stringify(gameState, null, 2)}</pre>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Rules
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Github width={16} height={16} />
-          GitHub
-        </a>
-      </footer>
-    </div>
-  )
+    <GameStateContext.Provider value={{ gameState, player, gameID }}>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-16 shrink-0 items-center gap-2">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+            </div>
+          </header>
+          <Board />
+          <pre>{JSON.stringify(gameState, null, 2)}</pre>
+        </SidebarInset>
+      </SidebarProvider>
+    </GameStateContext.Provider>
+  );
 }

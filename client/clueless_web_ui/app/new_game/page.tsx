@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Github } from "lucide-react";
-import Image from "next/image";
+import { BookMarked, Github, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -25,6 +25,7 @@ const formSchema = z.object({
 
 export default function Home() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,9 +35,10 @@ export default function Home() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     // ✅ This will be type-safe and validated.
     const rawResp = await fetch(
-      "https://clueless-server-915069415929.us-east1.run.app/new_game",
+      process.env.NEXT_PUBLIC_SERVER_URL + "/new_game",
       {
         method: "POST",
         headers: {
@@ -51,11 +53,14 @@ export default function Home() {
     console.log(content);
     try {
       localStorage.setItem("gameID", content);
+      localStorage.setItem("player", "player1");
     } catch {
       console.error("Err adding the game ID to local storage");
     } finally {
       router.push("/play");
     }
+
+    setIsLoading(false);
   }
 
   return (
@@ -84,9 +89,13 @@ export default function Home() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="m-3">
-              Start Game
-            </Button>
+            {isLoading ? (
+              <Loader2 className="animate-spin self-center m-4" />
+            ) : (
+              <Button type="submit" className="m-3">
+                Start Game
+              </Button>
+            )}
           </form>
         </Form>
       </main>
@@ -97,13 +106,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
+          <BookMarked width={16} height={16}/>
           Rules
         </a>
         <a

@@ -1,8 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Github } from "lucide-react";
-import Image from "next/image";
+import { BookMarked, Github } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -35,7 +34,7 @@ export default function Home() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // ✅ This will be type-safe and validated.
     const rawResp = await fetch(
-      `https://clueless-server-915069415929.us-east1.run.app/State?gameKey=${values.id}`,
+      process.env.NEXT_PUBLIC_SERVER_URL + `/State?gameKey=${values.id}`,
       {
         method: "POST",
         headers: {
@@ -109,13 +108,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
+          <BookMarked width={16} height={16} />
           Rules
         </a>
         <a
