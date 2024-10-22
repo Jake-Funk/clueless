@@ -202,6 +202,8 @@ class GameState:
 
         outputDict["player_character_mapping"] = self.player_character_mapping
 
+        outputDict["victory_state"] = self.victory_state
+
         # player cards
         for i, card_list in enumerate(self.player_cards):
             currentPlayer = "player" + str(i + 1)
