@@ -2,7 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState, GameEvent
-from util.enums import MoveAction, HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum
+from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum, EndGameEnum
+from util.actions import NewGameRequest, MoveAction, Statement
 from util.functions import get_player_location
 from util.movement import Map, move_player, validate_move, does_possible_move_exist
 from pydantic import BaseModel
@@ -33,26 +34,6 @@ app.add_middleware(
 )
 
 
-class NewGameRequest(BaseModel):
-    num_players: int
-
-
-class Statement(BaseModel):
-    """
-    Class that will act as an input format for suggestions and accusations
-    TODO: conform this to the Enums defined in enums.py (would require pydantic for those classes)
-    """
-
-    class Details(BaseModel):
-        person: PlayerEnum
-        weapon: WeaponEnum
-        room: RoomEnum
-
-    gameKey: str | None
-    player: str | None
-    statementDetails: Details | None
-
-
 @app.post("/new_game")
 async def initialize_game(req: NewGameRequest) -> str:
     try:
@@ -67,20 +48,32 @@ async def initialize_game(req: NewGameRequest) -> str:
 
 @app.post("/move")
 async def move(movement: MoveAction):
-    # Check if player can be found on current map
+    """
+    Endpoint to validate and execute a move action desired by the player. The
+    endpoint takes in a MoveAction as input, which contains the player making
+    the action, the game id and the desired location to move to.
+    """
+    # Check if game exists
     if movement.id == None or movement.id not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
     key = movement.id
 
+    # Check if player can be found in the current map
     try:
         current_location = get_player_location(movement.player, games[key])
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
+    # Check if there exists a possible move
     if not does_possible_move_exist(current_location, games[key]):
         games[key].next_player()
         logger.info("No possible move available. Transitioning to next player.")
         return {"Response": f"No valid move available. Moving to next Player."}
+
+    # Check if the player can make an action
+    if movement.player not in games[key].moveable_players:
+        logger.info(f"{movement.player} cannot take actions; moving to next player.")
+        games[key].next_player()
 
     http_code = validate_move(movement, current_location, games[key])
 
@@ -128,6 +121,53 @@ async def gameState(gameKey: str) -> dict:
 
     # convert the GameState into a dict of strings and return it
     return currentGame.dump_to_dict()
+
+
+@app.post("/accusation", status_code=200)
+async def makeAccusation(accusation: Statement):
+    """
+    Endpoint to validate and execute an Accuse action from the player. The function
+    takes in a Statement object. If all details are None, the accusation phase is
+    skipped.
+    """
+    # Check if game exists
+    if accusation.id == None or accusation.id not in games.keys():
+        raise HTTPException(status_code=404, detail="Game not found.")
+    game = games[accusation.id]
+
+    # If the accusation Statement is all None, no accusation is desired
+    # and move to the next player. Not logging as it will be the average action
+    accval = accusation.statementDetails
+    if not (accval.person or accval.weapon or accval.room):
+        # Move game to the next player and the move phase
+        game.next_player()
+        game.current_turn.phase = "move"
+    else:
+        # If the accusation is correct, end the game
+        if (
+            accval.person == game.solution.person
+            and accval.weapon == game.solution.weapon
+            and accval.room == game.solution.room
+        ):
+            logger.info(
+                f"{accusation.suggestor} correctly put together the Clues and won the game!"
+            )
+            logger.info(f"*****Game Over*****")
+            game.victory_state = EndGameEnum.winner_found
+        # Otherwise, the player can continue playing only as an observor to disprove
+        # suggestions; i.e. they cannot move, make suggestions or accusations.
+        # Their only purpose is to disprove other suggestions.
+        else:
+            logger.info(f"{accusation.suggestor}'s accusation was not correct.")
+            logger.info("They will remain to provide input on suggestions.")
+            # Remove player and transition to the next one
+            game.moveable_players.remove(accusation.suggestor)
+            if len(game.moveable_players) == 0:
+                logger.info("No Players left to make correct accusations.")
+                logger.info("*****Game Over*****")
+                game.victory_state = EndGameEnum.no_winners
+            game.next_player()
+            game.current_turn.phase = "move"
 
 
 @app.post("/suggestion", status_code=200)

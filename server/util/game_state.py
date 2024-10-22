@@ -1,11 +1,9 @@
 from enum import Enum
-from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum
+from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum, EndGameEnum
 from typing import Dict
 from dataclasses import dataclass
 from datetime import datetime
 import random
-
-PLAYERS = [player for player in PlayerEnum]
 
 
 class TurnPhase(str, Enum):
@@ -97,30 +95,38 @@ class GameState:
         self.player_cards: list[list[str]] = self.deal_remaining_cards(num_players)
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
-        # TODO: Assigning players arbitrarily as in the below line will work for
-        # the minimal increment but will need to support player chosen characters
-        # for the target increment.
-        self.avail_players = PLAYERS[:num_players]
 
+        # TODO: This will need an update to proper player IDs
+        self.moveable_players = []  # For tracking what players can still play
+        self.player_order = []  # For tracking player order
+
+        # Mapping player ids to game characters
         self.player_character_mapping: Dict[str, PlayerEnum] = (
             player_character_mapping if player_character_mapping else {}
         )
         allCharacters = list(PlayerEnum)
         for i in range(num_players):
             randCharacter = random.choice(allCharacters)
-            self.player_character_mapping["player" + str(i + 1)] = randCharacter
+            player_id = "player" + str(i + 1)
+            self.player_character_mapping[player_id] = randCharacter
             allCharacters.remove(randCharacter)
+
+            self.moveable_players.append(player_id)
+            self.player_order.append(player_id)
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
             self.map[item] = []
 
+        # Starting Player locations
         self.map[HallEnum.hall_to_lounge] = [PlayerEnum.miss_scarlet]
         self.map[HallEnum.lounge_to_dining] = [PlayerEnum.col_mustard]
         self.map[HallEnum.ballroom_to_kitchen] = [PlayerEnum.mrs_white]
         self.map[HallEnum.conservatory_to_ballroom] = [PlayerEnum.mr_green]
         self.map[HallEnum.lib_to_conservatory] = [PlayerEnum.mrs_peacock]
         self.map[HallEnum.study_to_lib] = [PlayerEnum.prof_plum]
+
+        self.victory_state = EndGameEnum.keep_playing
 
         self.log: list[GameEvent] = []
 
@@ -173,14 +179,14 @@ class GameState:
         """
         self.current_turn.player += 1
 
-        if self.current_turn.player >= len(self.avail_players):
+        if self.current_turn.player >= len(self.player_order):
             self.current_turn.player = 0
 
     def get_current_player(self) -> PlayerEnum:
         """
         Utility function to get the current player of the game
         """
-        return self.avail_players[self.current_turn.player]
+        return self.player_order[self.current_turn.player]
 
     def dump_to_dict(self) -> dict:
         """
@@ -195,6 +201,8 @@ class GameState:
         outputDict["solution"]["room"] = self.solution.room
 
         outputDict["player_character_mapping"] = self.player_character_mapping
+
+        outputDict["victory_state"] = self.victory_state
 
         # player cards
         for i, card_list in enumerate(self.player_cards):

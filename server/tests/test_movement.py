@@ -1,6 +1,7 @@
 from util.functions import get_player_location
 from util.game_state import GameState
-from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum, MoveAction
+from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum
+from util.actions import MoveAction
 from util.movement import move_player, validate_move, does_possible_move_exist
 from tests.data.move_actions import MOVES, DUMMY_MOVE_ID
 import pytest
