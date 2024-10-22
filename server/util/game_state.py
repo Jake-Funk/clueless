@@ -1,5 +1,5 @@
 from enum import Enum
-from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum
+from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum, EndGameEnum
 from typing import Dict
 from dataclasses import dataclass
 from datetime import datetime
@@ -125,6 +125,8 @@ class GameState:
         self.map[HallEnum.conservatory_to_ballroom] = [PlayerEnum.mr_green]
         self.map[HallEnum.lib_to_conservatory] = [PlayerEnum.mrs_peacock]
         self.map[HallEnum.study_to_lib] = [PlayerEnum.prof_plum]
+
+        self.victory_state = EndGameEnum.keep_playing
 
         self.log: list[GameEvent] = []
 

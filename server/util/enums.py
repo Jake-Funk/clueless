@@ -60,3 +60,9 @@ class HttpEnum(IntEnum):
     accepted = 202
     no_content = 204
     internal_error = 500
+
+
+class EndGameEnum(IntEnum):
+    keep_playing = 0
+    no_winners = 1
+    winner_found = 2

@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState, GameEvent
-from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum
+from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum, EndGameEnum
 from util.actions import NewGameRequest, MoveAction, Statement
 from util.functions import get_player_location
 from util.movement import Map, move_player, validate_move, does_possible_move_exist
@@ -149,12 +149,11 @@ async def makeAccusation(accusation: Statement):
             and accval.weapon == game.solution.weapon
             and accval.room == game.solution.room
         ):
-            # TODO: Define how we wish to signal the end of the game
             logger.info(
                 f"{accusation.suggestor} correctly put together the Clues and won the game!"
             )
             logger.info(f"*****Game Over*****")
-            return False
+            game.victory_state = EndGameEnum.winner_found
         # Otherwise, the player can continue playing only as an observor to disprove
         # suggestions; i.e. they cannot move, make suggestions or accusations.
         # Their only purpose is to disprove other suggestions.
@@ -166,7 +165,7 @@ async def makeAccusation(accusation: Statement):
             if len(game.moveable_players) == 0:
                 logger.info("No Players left to make correct accusations.")
                 logger.info("*****Game Over*****")
-                return False
+                game.victory_state = EndGameEnum.no_winners
             game.next_player()
             game.current_turn.phase = "move"
 
