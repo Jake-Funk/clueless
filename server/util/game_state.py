@@ -109,7 +109,9 @@ class GameState:
         for i in range(num_players):
             randCharacter = random.choice(allCharacters)
             self.player_character_mapping["player" + str(i + 1)] = randCharacter
-            self.player_character_mapping[randCharacter] = "player" + str(i + 1) # have the map store both directions of the mapping 
+            self.player_character_mapping[randCharacter] = "player" + str(
+                i + 1
+            )  # have the map store both directions of the mapping
             allCharacters.remove(randCharacter)
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
