@@ -109,6 +109,7 @@ class GameState:
         for i in range(num_players):
             randCharacter = random.choice(allCharacters)
             self.player_character_mapping["player" + str(i + 1)] = randCharacter
+            self.player_character_mapping[randCharacter] = "player" + str(i + 1) # have the map store both directions of the mapping 
             allCharacters.remove(randCharacter)
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
@@ -202,5 +203,8 @@ class GameState:
             outputDict[currentPlayer] = card_list
 
         outputDict["map"] = self.map
+
+        # add a printout of the game phase to the game state dictionary
+        outputDict["game_phase"] = self.current_turn
 
         return outputDict
