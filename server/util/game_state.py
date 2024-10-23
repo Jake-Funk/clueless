@@ -110,9 +110,6 @@ class GameState:
             randCharacter = random.choice(allCharacters)
             player_id = "player" + str(i + 1)
             self.player_character_mapping[player_id] = randCharacter
-            self.player_character_mapping[randCharacter] = (
-                player_id  # have the map store both directions of the mapping
-            )
             allCharacters.remove(randCharacter)
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
