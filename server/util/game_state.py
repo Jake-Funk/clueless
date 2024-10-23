@@ -212,6 +212,6 @@ class GameState:
         outputDict["map"] = self.map
 
         # return phase of game in dictionary
-        outputDict['game_phase'] = self.current_turn
+        outputDict["game_phase"] = self.current_turn
 
         return outputDict
