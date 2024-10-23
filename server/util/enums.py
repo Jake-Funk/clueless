@@ -62,12 +62,7 @@ class HttpEnum(IntEnum):
     internal_error = 500
 
 
-@dataclass
-class MoveAction:
-    """
-    Class to describe a move action from a player
-    """
-
-    player: PlayerEnum
-    location: HallEnum | RoomEnum
-    id: str | None = None
+class EndGameEnum(IntEnum):
+    keep_playing = 0
+    no_winners = 1
+    winner_found = 2

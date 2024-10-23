@@ -1,4 +1,5 @@
-from util.enums import MoveAction, PlayerEnum, HallEnum, RoomEnum
+from util.enums import PlayerEnum, HallEnum, RoomEnum
+from util.actions import MoveAction
 
 DUMMY_MOVE_ID = "0001"  # Dummy ID
 

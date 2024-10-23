@@ -1,5 +1,6 @@
 from util.game_state import GameState
-from util.enums import PlayerEnum, RoomEnum, HallEnum, MoveAction, HttpEnum
+from util.enums import PlayerEnum, RoomEnum, HallEnum, HttpEnum
+from util.actions import MoveAction
 
 # from util.game_state import GameState
 
