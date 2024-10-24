@@ -46,9 +46,12 @@ async def initialize_game(req: NewGameRequest) -> str:
     return key
 
 
-@app.post("/valid-move")
+@app.post("/valid-move", status_code=200)
 async def check_valid_move(gameKey: str, player: str):
-    """ """
+    """
+    Endpoint to throw an error code if the given player cannot make a move.
+    Assuming the game phase is on "move"
+    """
     # Check if game exists
     if gameKey == None or gameKey not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
@@ -57,21 +60,17 @@ async def check_valid_move(gameKey: str, player: str):
     try:
         current_location = get_player_location(player, games[gameKey])
     except Exception:
-        raise HTTPException(status_code=404, detail="Player not found on Map.")
+        raise HTTPException(status_code=404, detail=f"{player} not found on Map.")
 
     # Check if there exists a possible move
     if not does_possible_move_exist(current_location, games[gameKey]):
         games[gameKey].next_player()
-        logger.info("No possible move available. Transitioning to next player.")
-        return {"Response": False}
+        raise HTTPException(status_code=403, detail=f"{player} has no possible move.")
 
     # Check if the player can make an action
     if player not in games[gameKey].moveable_players:
         games[key].next_player()
-        logger.info(f"{movement.player} cannot take actions; moving to next player.")
-        return {"Response": False}
-
-    return {"Response": True}
+        raise HTTPException(status_code=403, detail=f"{player} cannot make a move.")
 
 
 @app.post("/move")
@@ -309,7 +308,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
 
 
 @app.post("/map", status_code=200)
-async def makeSuggestion() -> dict:
+async def getMap() -> dict:
     """
     Endpoint to return the map so the client can provide only
     the possible locations for movement.
