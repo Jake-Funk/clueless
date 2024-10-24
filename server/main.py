@@ -46,6 +46,34 @@ async def initialize_game(req: NewGameRequest) -> str:
     return key
 
 
+@app.post("/valid-move")
+async def check_valid_move(gameKey: str, player: str):
+    """ """
+    # Check if game exists
+    if gameKey == None or gameKey not in games.keys():
+        raise HTTPException(status_code=404, detail="Game not found.")
+
+    # Check if player can be found in the current map
+    try:
+        current_location = get_player_location(player, games[gameKey])
+    except Exception:
+        raise HTTPException(status_code=404, detail="Player not found on Map.")
+
+    # Check if there exists a possible move
+    if not does_possible_move_exist(current_location, games[gameKey]):
+        games[gameKey].next_player()
+        logger.info("No possible move available. Transitioning to next player.")
+        return {"Response": False}
+
+    # Check if the player can make an action
+    if player not in games[gameKey].moveable_players:
+        games[key].next_player()
+        logger.info(f"{movement.player} cannot take actions; moving to next player.")
+        return {"Response": False}
+
+    return {"Response": True}
+
+
 @app.post("/move")
 async def move(movement: MoveAction):
     """
@@ -63,17 +91,6 @@ async def move(movement: MoveAction):
         current_location = get_player_location(movement.player, games[key])
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
-
-    # Check if there exists a possible move
-    if not does_possible_move_exist(current_location, games[key]):
-        games[key].next_player()
-        logger.info("No possible move available. Transitioning to next player.")
-        return {"Response": f"No valid move available. Moving to next Player."}
-
-    # Check if the player can make an action
-    if movement.player not in games[key].moveable_players:
-        logger.info(f"{movement.player} cannot take actions; moving to next player.")
-        games[key].next_player()
 
     http_code = validate_move(movement, current_location, games[key])
 
