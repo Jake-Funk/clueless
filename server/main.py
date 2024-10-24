@@ -289,3 +289,17 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     # change game turn phase
     currentGame.current_turn.phase = "accuse"
     return returnDict
+
+
+@app.post("/map", status_code=200)
+async def makeSuggestion() -> dict:
+    """
+    Endpoint to return the map so the client can provide only
+    the possible locations for movement.
+    """
+    try:
+        return Map
+    except Exception:
+        raise HTTPException(
+            status_code=HttpEnum.internal_error, detail="Map not found."
+        )
