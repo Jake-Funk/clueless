@@ -6,8 +6,11 @@ from util.movement import move_player, validate_move, does_possible_move_exist
 from tests.data.move_actions import MOVES, DUMMY_MOVE_ID
 import pytest
 
+# Default player ids in a 6 player game
+default_players = [f"player{i+1}" for i in range(6)]
 
-@pytest.mark.parametrize("player", list(PlayerEnum))
+
+@pytest.mark.parametrize("player", default_players)
 def test_get_player_default_locations(player: int):
     """
     Test to gaurantee that the get_player_location
@@ -16,18 +19,19 @@ def test_get_player_default_locations(player: int):
     default_gs = GameState(6)
 
     location = get_player_location(player, default_gs)
+    character = default_gs.player_character_mapping[player]
 
-    if player == PlayerEnum.miss_scarlet:
+    if character == PlayerEnum.miss_scarlet:
         assert location == HallEnum.hall_to_lounge
-    elif player == PlayerEnum.col_mustard:
+    elif character == PlayerEnum.col_mustard:
         assert location == HallEnum.lounge_to_dining
-    elif player == PlayerEnum.mrs_white:
+    elif character == PlayerEnum.mrs_white:
         assert location == HallEnum.ballroom_to_kitchen
-    elif player == PlayerEnum.mr_green:
+    elif character == PlayerEnum.mr_green:
         assert location == HallEnum.conservatory_to_ballroom
-    elif player == PlayerEnum.mrs_peacock:
+    elif character == PlayerEnum.mrs_peacock:
         assert location == HallEnum.lib_to_conservatory
-    elif player == PlayerEnum.prof_plum:
+    elif character == PlayerEnum.prof_plum:
         assert location == HallEnum.study_to_lib
     else:
         assert False, "Not a valid player"
