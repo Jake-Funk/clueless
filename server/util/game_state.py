@@ -106,7 +106,13 @@ class GameState:
         )
         allCharacters = list(PlayerEnum)
         for i in range(num_players):
-            randCharacter = random.choice(allCharacters)
+            # First player is always Miss Scarlet
+            if i == 0:
+                # Miss Scarlet will be the first in the list
+                randCharacter = allCharacters[0]
+            else:
+                randCharacter = random.choice(allCharacters)
+
             player_id = "player" + str(i + 1)
             self.player_character_mapping[player_id] = randCharacter
             allCharacters.remove(randCharacter)
