@@ -189,11 +189,10 @@ class GameState:
             return
 
         while True:
-            idx = self.current_turn.player
-            idx += 1
-            if idx >= len(self.player_order):
-                idx = 0
-            if self.player_order[idx] not in self.moveable_players:
+            self.current_turn.player += 1
+            if self.current_turn.player >= len(self.player_order):
+                self.current_turn.player = 0
+            if self.player_order[self.current_turn.player] not in self.moveable_players:
                 continue
             else:
                 break
