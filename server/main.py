@@ -1,12 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from util.game_state import GameState, GameEvent
-from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum, EndGameEnum
+from util.game_state import GameState
+from util.enums import RoomEnum, HttpEnum, EndGameEnum
 from util.actions import NewGameRequest, MoveAction, Statement
-from util.functions import get_player_location
+from util.functions import get_character_location
 from util.movement import Map, move_player, validate_move, does_possible_move_exist
-from pydantic import BaseModel
 import random
 
 import uuid
@@ -58,7 +57,9 @@ async def check_valid_move(gameKey: str, player: str):
 
     # Check if player can be found in the current map
     try:
-        current_location = get_player_location(player, games[gameKey])
+        current_location = get_character_location(
+            games[gameKey].player_character_mapping[player], games[gameKey]
+        )
     except Exception:
         raise HTTPException(status_code=404, detail=f"{player} not found on Map.")
 
@@ -69,7 +70,7 @@ async def check_valid_move(gameKey: str, player: str):
 
     # Check if the player can make an action
     if player not in games[gameKey].moveable_players:
-        games[key].next_player()
+        games[gameKey].next_player()
         raise HTTPException(status_code=403, detail=f"{player} cannot make a move.")
 
 
@@ -87,29 +88,34 @@ async def move(movement: MoveAction):
 
     # Check if player can be found in the current map
     try:
-        current_location = get_player_location(movement.player, games[key])
+        current_location = get_character_location(
+            games[key].player_character_mapping[movement.player], games[key]
+        )
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
     http_code = validate_move(movement, current_location, games[key])
 
     if http_code[0] == HttpEnum.good:
-        move_player(movement, current_location, games[key])
+        move_player(
+            character=games[key].player_character_mapping[movement.player],
+            target_location=movement.location,
+            current_location=current_location,
+            gs=games[key],
+        )
         # Check if player entered a room
         # If they have, move the game phase to suggestion
         # Otherwise keep the same phase but change players
         if isinstance(movement.location, RoomEnum):
             games[key].current_turn.phase = "suggest"
-            logging.info(f"Moving {movement.player.value} to {movement.location.value}")
-            logging.info(f"{movement.player.value} can now make a suggestion")
+            logging.info(f"Moving {movement.player} to {movement.location}")
+            logging.info(f"{movement.player} can now make a suggestion")
         else:
             games[key].next_player()
-            logging.info(
-                f"{movement.player.value} moved to a Hallway, going to next player"
-            )
+            logging.info(f"{movement.player} moved to a Hallway, going to next player")
 
         return {
-            "Response": f"Successfully moved {movement.player.value} to {movement.location.value}. Moving to next Player."
+            "Response": f"Successfully moved {movement.player} to {movement.location.value}. Moving to next Player."
         }
     else:
         raise HTTPException(status_code=http_code[0].value, detail=http_code[1])
@@ -147,9 +153,9 @@ async def makeAccusation(accusation: Statement):
     skipped.
     """
     # Check if game exists
-    if accusation.id == None or accusation.id not in games.keys():
+    if accusation.gameKey == None or accusation.gameKey not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
-    game = games[accusation.id]
+    game = games[accusation.gameKey]
 
     # If the accusation Statement is all None, no accusation is desired
     # and move to the next player. Not logging as it will be the average action
@@ -165,25 +171,27 @@ async def makeAccusation(accusation: Statement):
             and accval.weapon == game.solution.weapon
             and accval.room == game.solution.room
         ):
-            logger.info(
-                f"{accusation.suggestor} correctly put together the Clues and won the game!"
+            logging.info(
+                f"{accusation.player} correctly put together the Clues and won the game!"
             )
-            logger.info(f"*****Game Over*****")
+            logging.info(f"*****Game Over*****")
             game.victory_state = EndGameEnum.winner_found
         # Otherwise, the player can continue playing only as an observor to disprove
         # suggestions; i.e. they cannot move, make suggestions or accusations.
         # Their only purpose is to disprove other suggestions.
         else:
-            logger.info(f"{accusation.suggestor}'s accusation was not correct.")
-            logger.info("They will remain to provide input on suggestions.")
+            logging.info(f"{accusation.player}'s accusation was not correct.")
+            logging.info("They will remain to provide input on suggestions.")
             # Remove player and transition to the next one
-            game.moveable_players.remove(accusation.suggestor)
+            game.moveable_players.remove(accusation.player)
             if len(game.moveable_players) == 0:
-                logger.info("No Players left to make correct accusations.")
-                logger.info("*****Game Over*****")
+                logging.info("No Players left to make correct accusations.")
+                logging.info("*****Game Over*****")
                 game.victory_state = EndGameEnum.no_winners
             game.next_player()
             game.current_turn.phase = "move"
+
+    return game.victory_state
 
 
 @app.post("/suggestion", status_code=200)
@@ -203,10 +211,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     suggestor: str
     gameKey: str
     suggestion: Statement.Details
-    returnDict = {
-        "response": PlayerEnum | RoomEnum | WeaponEnum | None,
-        "player": str | None,
-    }
+    returnDict = {"response": "", "player": ""}
 
     # exceptions for unprovided data
     if not playerSuggestion.player:
@@ -251,21 +256,22 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
 
     # Ensure the suggestor is in the same room as the suggestion they are making
     # Satisfies game requirement
-    if get_player_location(playersCharacter, currentGame) != suggestion.room:
+    if get_character_location(playersCharacter, currentGame) != suggestion.room:
         # TODO: This exception is necessary once the players can actually make suggestions - to test it will be commented out
         raise HTTPException(
             status_code=HttpEnum.forbidden,
             detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made",
         )
 
-    # move the target player to the suggested room
+        # move the target player to the suggested room
     # get current room
-    movingPlayerCurrentLocation = get_player_location(suggestion.person, currentGame)
+    movingPlayerCurrentLocation = get_character_location(suggestion.person, currentGame)
     # create a move object of the suggestion movement
-    forcedMove = MoveAction(player=suggestion.person, location=suggestion.room)
+
     # execute move
     move_player(
-        movement=forcedMove,
+        character=suggestion.person,
+        target_location=suggestion.room,
         current_location=movingPlayerCurrentLocation,
         gs=currentGame,
     )

@@ -49,7 +49,7 @@ class GameTurn:
     phase: TurnPhase = TurnPhase.move
 
     def print(self, std_out: bool = True) -> str:
-        msg = f"It is {self.player.value}'s turn to {self.phase.value}."
+        msg = f"It is {self.player}'s turn to {self.phase.value}."
         if std_out:
             print(msg)
         return msg
@@ -183,10 +183,19 @@ class GameState:
         """
         Atomic function to change the current turn's player to the next one
         """
-        self.current_turn.player += 1
+        if not self.moveable_players:
+            return
+        elif len(self.moveable_players) == 1:
+            return
 
-        if self.current_turn.player >= len(self.player_order):
-            self.current_turn.player = 0
+        while True:
+            self.current_turn.player += 1
+            if self.current_turn.player >= len(self.player_order):
+                self.current_turn.player = 0
+            if self.player_order[self.current_turn.player] not in self.moveable_players:
+                continue
+            else:
+                break
 
     def get_current_player(self) -> PlayerEnum:
         """
@@ -218,6 +227,9 @@ class GameState:
         outputDict["map"] = self.map
 
         # return phase of game in dictionary
-        outputDict["game_phase"] = self.current_turn
+        outputDict["game_phase"] = {
+            "phase": self.current_turn.phase,
+            "player": self.player_order[self.current_turn.player],
+        }
 
         return outputDict

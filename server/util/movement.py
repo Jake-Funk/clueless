@@ -68,7 +68,10 @@ Map = {
 
 
 def move_player(
-    movement: MoveAction, current_location: RoomEnum | HallEnum, gs: GameState
+    character: PlayerEnum | None,
+    target_location: RoomEnum | HallEnum | None,
+    current_location: RoomEnum | HallEnum | None,
+    gs: GameState,
 ) -> None:
     """
     Function to move a player in the map within the game state.
@@ -83,8 +86,8 @@ def move_player(
     Returns:
         None
     """
-    gs.map[current_location].remove(movement.player)
-    gs.map[movement.location].append(movement.player)
+    gs.map[current_location].remove(character)
+    gs.map[target_location].append(character)
 
 
 def validate_move(
