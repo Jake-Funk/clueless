@@ -1,9 +1,8 @@
 from util.functions import get_player_location
 from util.game_state import GameState
 from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum
-from util.actions import MoveAction
 from util.movement import move_player, validate_move, does_possible_move_exist
-from tests.data.move_actions import MOVES, DUMMY_MOVE_ID
+from tests.data.move_actions import MOVES
 import pytest
 
 # Default player ids in a 6 player game
@@ -11,7 +10,7 @@ default_players = [f"player{i+1}" for i in range(6)]
 
 
 @pytest.mark.parametrize("player", default_players)
-def test_get_player_default_locations(player: int):
+def test_get_player_default_locations(player: str):
     """
     Test to gaurantee that the get_player_location
     function works using the default game state
@@ -19,7 +18,7 @@ def test_get_player_default_locations(player: int):
     default_gs = GameState(6)
 
     location = get_player_location(player, default_gs)
-    character = default_gs.player_character_mapping[player]
+    character = PlayerEnum(default_gs.player_character_mapping[player])
 
     if character == PlayerEnum.miss_scarlet:
         assert location == HallEnum.hall_to_lounge

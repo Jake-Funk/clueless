@@ -1,8 +1,10 @@
-from util.enums import PlayerEnum, WeaponEnum, RoomEnum, HallEnum
+from util.enums import PlayerEnum, RoomEnum, HallEnum
 from util.game_state import GameState
 
 
-def get_player_location(player: str, gs: GameState) -> RoomEnum | HallEnum:
+def get_character_location(
+    character: PlayerEnum | None, gs: GameState
+) -> RoomEnum | HallEnum:
     """
     Function to return the location of a given player
 
@@ -15,6 +17,6 @@ def get_player_location(player: str, gs: GameState) -> RoomEnum | HallEnum:
         None: If the player does not exist, should NOT happen
     """
     for location in gs.map:
-        if gs.player_character_mapping[player] in gs.map[location]:
+        if character in gs.map[location]:
             return location
-    raise Exception("Player not found.", player.value)
+    raise Exception("Character not found.", character)

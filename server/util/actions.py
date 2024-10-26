@@ -1,5 +1,6 @@
 from enum import Enum, IntEnum
 from dataclasses import dataclass
+from fastapi import Header
 from pydantic import BaseModel
 import random
 
@@ -17,13 +18,13 @@ class Statement(BaseModel):
     """
 
     class Details(BaseModel):
-        person: PlayerEnum | None = None
-        weapon: WeaponEnum | None = None
-        room: RoomEnum | None = None
+        person: PlayerEnum | None
+        weapon: WeaponEnum | None
+        room: HallEnum | RoomEnum | None
 
-    gameKey: str | None
-    player: str | None
-    statementDetails: Details | None
+    gameKey: str
+    player: str
+    statementDetails: Details
 
 
 @dataclass
@@ -33,5 +34,5 @@ class MoveAction:
     """
 
     player: str
-    location: HallEnum | RoomEnum
+    location: HallEnum | RoomEnum | None
     id: str | None = None
