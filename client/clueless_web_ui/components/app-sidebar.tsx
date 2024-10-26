@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { BookMarked, Copy, GithubIcon, Search } from "lucide-react"
+import * as React from "react";
+import { BookMarked, Copy, GithubIcon, Search } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
+import { NavMain } from "@/components/nav-main";
+import { NavSecondary } from "@/components/nav-secondary";
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +13,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { GameStateContext } from "@/app/play/page"
-import { Button } from "./ui/button"
-import { Separator } from "./ui/separator"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/sidebar";
+import { GameStateContext } from "@/app/play/page";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 const navSecondary = [
   {
@@ -30,11 +30,11 @@ const navSecondary = [
     url: "#",
     icon: GithubIcon,
   },
-]
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { gameID, gameState, player } = React.useContext<any>(GameStateContext) // eslint-disable-line
-  const { toast } = useToast()
+  const { gameID, gameState, player } = React.useContext<any>(GameStateContext); // eslint-disable-line
+  const { toast } = useToast();
 
   return (
     <Sidebar variant="inset" {...props}>
@@ -61,8 +61,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               variant="outline"
               size="icon"
               onClick={() => {
-                navigator.clipboard.writeText(gameID)
-                toast({ description: "Game ID copied to clipboard" })
+                navigator.clipboard.writeText(gameID);
+                toast({ description: "Game ID copied to clipboard" });
               }}
             >
               <Copy className="p-1" />
@@ -70,15 +70,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         </div>
         <div>
-        
-        <div className="font-bold">You are: <span className="font-normal">{player}</span></div>
-        {player && (
-          <div>
-             playing as{" "}
-            <span>{gameState.player_character_mapping[player]}</span>
+          <div className="font-bold">
+            You are: <span className="font-normal">{player}</span>
           </div>
-        )}
-
+          {player && (
+            <div>
+              playing as{" "}
+              <span>{gameState.player_character_mapping[player]}</span>
+            </div>
+          )}
         </div>
       </SidebarHeader>
       <Separator />
@@ -88,5 +88,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter></SidebarFooter>
     </Sidebar>
-  )
+  );
 }

@@ -1,7 +1,7 @@
-"use client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { BookMarked, Github } from "lucide-react"
+"use client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { BookMarked, Github } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -9,30 +9,30 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useState } from "react"
+} from "@/components/ui/form";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useState } from "react";
 
 const formSchema = z.object({
   id: z.coerce.string().uuid("Not a valid game ID"),
-})
+});
 
 export default function Home() {
-  const router = useRouter()
-  const [err, setErr] = useState(false)
-  const [playerSelect, setPlayerSelect] = useState(false)
-  const [playerOptions, setPlayerOptions] = useState<string[]>([])
+  const router = useRouter();
+  const [err, setErr] = useState(false);
+  const [playerSelect, setPlayerSelect] = useState(false);
+  const [playerOptions, setPlayerOptions] = useState<string[]>([]);
 
   function chosePlayer(player: string) {
     try {
-      localStorage.setItem("player", player)
+      localStorage.setItem("player", player);
     } catch {
-      console.error("Problem adding data to local storage")
+      console.error("Problem adding data to local storage");
     }
-    router.push("/play")
+    router.push("/play");
   }
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,7 +40,7 @@ export default function Home() {
     defaultValues: {
       id: "",
     },
-  })
+  });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // ✅ This will be type-safe and validated.
@@ -52,21 +52,21 @@ export default function Home() {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-      }
-    )
+      },
+    );
     if (rawResp.status == 200) {
-      const content = await rawResp.json()
+      const content = await rawResp.json();
 
-      console.log(content)
+      console.log(content);
       try {
-        localStorage.setItem("gameID", values.id)
-        setPlayerSelect(true)
-        setPlayerOptions(Object.keys(content.player_character_mapping))
+        localStorage.setItem("gameID", values.id);
+        setPlayerSelect(true);
+        setPlayerOptions(Object.keys(content.player_character_mapping));
       } catch {
-        console.error("Err adding the game ID to local storage")
+        console.error("Err adding the game ID to local storage");
       }
     } else {
-      setErr(true)
+      setErr(true);
     }
   }
 
@@ -94,7 +94,7 @@ export default function Home() {
                       <Input
                         {...field}
                         onFocus={() => {
-                          setErr(false)
+                          setErr(false);
                         }}
                       />
                     </FormControl>
@@ -125,11 +125,13 @@ export default function Home() {
                 <Button
                   key={item}
                   className="basis-1/3"
-                  onClick={() => {chosePlayer(item)}}
+                  onClick={() => {
+                    chosePlayer(item);
+                  }}
                 >
                   {item}
                 </Button>
-              )
+              );
             })}
           </div>
         </main>
@@ -155,5 +157,5 @@ export default function Home() {
         </a>
       </footer>
     </div>
-  )
+  );
 }
