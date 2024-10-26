@@ -102,7 +102,12 @@ export default function Home() {
                 <div>It is your turn.</div>
                 {currPhase == "move" && <MoveBtn />}
                 {currPhase == "suggest" && <SuggestBtn />}
-                {currPhase == "accuse" && <AccuseBtn />}
+                {currPhase == "accuse" && (
+                  <>
+                    <div>Do you want to make an accusation?</div>
+                    <AccuseBtn />
+                  </>
+                )}
               </>
             )}
           </div>
