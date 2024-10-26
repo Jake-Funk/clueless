@@ -1,15 +1,15 @@
-"use client";
-import AccuseBtn from "@/components/accuse-btn";
-import { AppSidebar } from "@/components/app-sidebar";
-import { Board } from "@/components/board";
-import MoveBtn from "@/components/move-btn";
-import SuggestBtn from "@/components/suggest-btn";
+"use client"
+import AccuseBtn from "@/components/accuse-btn"
+import { AppSidebar } from "@/components/app-sidebar"
+import { Board } from "@/components/board"
+import MoveBtn from "@/components/move-btn"
+import SuggestBtn from "@/components/suggest-btn"
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { createContext, useEffect, useState } from "react";
+} from "@/components/ui/sidebar"
+import { createContext, useEffect, useState } from "react"
 
 const defaultGameState = {
   game_phase: {
@@ -40,27 +40,27 @@ const defaultGameState = {
     10: "",
     11: "",
   },
-};
+}
 
 export const GameStateContext = createContext({
   gameState: defaultGameState,
   player: "",
   gameID: "",
-});
+})
 export default function Home() {
-  const [gameID, setGameId] = useState("");
-  const [player, setPlayer] = useState("");
-  const [gameState, setGameState] = useState(defaultGameState);
-  const currPlayer: string = gameState.game_phase.player;
-  const currPhase: string = gameState.game_phase.phase;
+  const [gameID, setGameId] = useState("")
+  const [player, setPlayer] = useState("")
+  const [gameState, setGameState] = useState(defaultGameState)
+  const currPlayer: string = gameState.game_phase.player
+  const currPhase: string = gameState.game_phase.phase
 
   useEffect(() => {
-    const value = localStorage.getItem("gameID") || "";
-    setGameId(value);
+    const value = localStorage.getItem("gameID") || ""
+    setGameId(value)
 
-    const playerNo = localStorage.getItem("player") || "";
-    setPlayer(playerNo);
-  }, []);
+    const playerNo = localStorage.getItem("player") || ""
+    setPlayer(playerNo)
+  }, [])
 
   useEffect(() => {
     async function getGameState() {
@@ -72,15 +72,15 @@ export default function Home() {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-        },
-      );
-      const content = await rawResp.json();
-      setGameState(content);
+        }
+      )
+      const content = await rawResp.json()
+      setGameState(content)
     }
     if (gameID) {
-      getGameState();
+      getGameState()
     }
-  }, [gameID]);
+  }, [gameID])
 
   return (
     <GameStateContext.Provider value={{ gameState, player, gameID }}>
@@ -116,5 +116,5 @@ export default function Home() {
         </SidebarInset>
       </SidebarProvider>
     </GameStateContext.Provider>
-  );
+  )
 }
