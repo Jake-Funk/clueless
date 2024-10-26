@@ -106,7 +106,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <BookMarked width={16} height={16}/>
+          <BookMarked width={16} height={16} />
           Rules
         </a>
         <a

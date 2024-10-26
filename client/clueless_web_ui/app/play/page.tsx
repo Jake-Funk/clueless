@@ -1,6 +1,9 @@
 "use client";
+import AccuseBtn from "@/components/accuse-btn";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Board } from "@/components/board";
+import MoveBtn from "@/components/move-btn";
+import SuggestBtn from "@/components/suggest-btn";
 import {
   SidebarInset,
   SidebarProvider,
@@ -9,6 +12,10 @@ import {
 import { createContext, useEffect, useState } from "react";
 
 const defaultGameState = {
+  game_phase: {
+    player: "",
+    phase: "",
+  },
   player_character_mapping: {},
   map: {
     study: [],
@@ -44,6 +51,8 @@ export default function Home() {
   const [gameID, setGameId] = useState("");
   const [player, setPlayer] = useState("");
   const [gameState, setGameState] = useState(defaultGameState);
+  const currPlayer: string = gameState.game_phase.player;
+  const currPhase: string = gameState.game_phase.phase;
 
   useEffect(() => {
     const value = localStorage.getItem("gameID") || "";
@@ -83,6 +92,20 @@ export default function Home() {
               <SidebarTrigger className="-ml-1" />
             </div>
           </header>
+          <div className="flex items-center space-x-4 p-4 justify-center">
+            {currPlayer != player ? (
+              <div>
+                It is {gameState.player_character_mapping[currPlayer]}'s turn.
+              </div>
+            ) : (
+              <>
+                <div>It is your turn.</div>
+                {currPhase == "move" && <MoveBtn />}
+                {currPhase == "suggest" && <SuggestBtn />}
+                {currPhase == "accuse" && <AccuseBtn />}
+              </>
+            )}
+          </div>
           <Board />
           <pre>{JSON.stringify(gameState, null, 2)}</pre>
         </SidebarInset>
