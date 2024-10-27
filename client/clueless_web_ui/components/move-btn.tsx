@@ -17,10 +17,10 @@ import {
   SelectValue,
 } from "./ui/select";
 import { useContext, useState } from "react";
-import { GameStateContext, gsObj } from "@/app/play/page";
+import { GameStateContext, gsObj } from "@/lib/types";
 
 interface mapObj {
-  [key: string | number]: (string|number)[];
+  [key: string | number]: (string | number)[];
 }
 
 const boardMap: mapObj = {
@@ -48,14 +48,17 @@ const boardMap: mapObj = {
 };
 
 export default function MoveBtn() {
-  const { gameState, player, gameID, setTrigger, trigger } = useContext(GameStateContext);
+  const { gameState, player, gameID, setTrigger, trigger } =
+    useContext(GameStateContext);
   const [open, setOpen] = useState(false);
   const [selection, setSelection] = useState("");
 
   function getAvailRooms() {
     for (const room in gameState.map) {
       if (
-        (gameState as gsObj).map[room].includes(gameState.player_character_mapping[player])
+        (gameState as gsObj).map[room].includes(
+          gameState.player_character_mapping[player],
+        )
       ) {
         return boardMap[room];
       }
@@ -77,11 +80,10 @@ export default function MoveBtn() {
     const content = await rawResp.json();
     if (rawResp.status == 200) {
       setOpen(false);
-      setTrigger(trigger+1)
+      setTrigger(trigger + 1);
     } else {
       console.log(content);
     }
-
   }
 
   return (
@@ -93,7 +95,8 @@ export default function MoveBtn() {
         <DialogHeader>
           <DialogTitle>Move your Character</DialogTitle>
           <DialogDescription>
-            Select where you want to move here. Click submit when you`&apos;`re done.
+            Select where you want to move here. Click submit when you`&apos;`re
+            done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

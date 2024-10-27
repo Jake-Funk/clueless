@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { useContext, useState } from "react";
-import { GameStateContext } from "@/app/play/page";
+import { GameStateContext } from "@/lib/types";
 
 const availPeople = [
   "Miss Scarlet",

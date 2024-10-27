@@ -1,90 +1,32 @@
-"use client"
-import AccuseBtn from "@/components/accuse-btn"
-import { AppSidebar } from "@/components/app-sidebar"
-import { Board } from "@/components/board"
-import MoveBtn from "@/components/move-btn"
-import SuggestBtn from "@/components/suggest-btn"
+"use client";
+import AccuseBtn from "@/components/accuse-btn";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Board } from "@/components/board";
+import MoveBtn from "@/components/move-btn";
+import SuggestBtn from "@/components/suggest-btn";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react"
+} from "@/components/ui/sidebar";
+import { defaultGameState, GameStateContext, gsObj } from "@/lib/types";
+import { useEffect, useState } from "react";
 
-const defaultGameState = {
-  game_phase: {
-    player: "",
-    phase: "",
-  },
-  player_character_mapping: {},
-  map: {
-    study: [],
-    hall: [],
-    lounge: [],
-    library: [],
-    billiard: [],
-    dining: [],
-    conservatory: [],
-    ballroom: [],
-    kitchen: [],
-    0: "",
-    1: "",
-    2: "",
-    3: "",
-    4: "",
-    5: "",
-    6: "",
-    7: "",
-    8: "",
-    9: "",
-    10: "",
-    11: "",
-  },
-}
-
-export interface gsObj {
-  game_phase: {
-    player: string,
-    phase: string,
-  },
-  player_character_mapping: {
-    [key: string]: string;
-  },
-  map: {
-    [key: string | number]: string[] | string;
-  },
-}
-
-interface gsContext {
-  gameState: gsObj,
-  player: string,
-  gameID: string,
-  trigger: number,
-  setTrigger: Dispatch<SetStateAction<number>>
-}
-
-export const GameStateContext = createContext<gsContext>({
-  gameState: defaultGameState,
-  player: "",
-  gameID: "",
-  trigger: 0,
-  setTrigger: ()=>{}
-})
 export default function Home() {
-  const [gameID, setGameId] = useState("")
-  const [player, setPlayer] = useState("")
-  const [trigger, setTrigger] = useState(0)
-  const [gameState, setGameState] = useState(defaultGameState)
-  const currPlayer: string = gameState.game_phase.player
-  const currPhase: string = gameState.game_phase.phase
+  const [gameID, setGameId] = useState("");
+  const [player, setPlayer] = useState("");
+  const [trigger, setTrigger] = useState(0);
+  const [gameState, setGameState] = useState(defaultGameState);
+  const currPlayer: string = gameState.game_phase.player;
+  const currPhase: string = gameState.game_phase.phase;
 
   useEffect(() => {
-    const value = localStorage.getItem("gameID") || ""
-    setGameId(value)
+    const value = localStorage.getItem("gameID") || "";
+    setGameId(value);
 
-    const playerNo = localStorage.getItem("player") || ""
-    setPlayer(playerNo)
-  }, [])
+    const playerNo = localStorage.getItem("player") || "";
+    setPlayer(playerNo);
+  }, []);
 
   useEffect(() => {
     async function getGameState() {
@@ -96,18 +38,20 @@ export default function Home() {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-        }
-      )
-      const content = await rawResp.json()
-      setGameState(content)
+        },
+      );
+      const content = await rawResp.json();
+      setGameState(content);
     }
     if (gameID) {
-      getGameState()
+      getGameState();
     }
-  }, [gameID, trigger])
+  }, [gameID, trigger]);
 
   return (
-    <GameStateContext.Provider value={{ gameState, player, gameID, trigger, setTrigger }}>
+    <GameStateContext.Provider
+      value={{ gameState, player, gameID, trigger, setTrigger }}
+    >
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -119,7 +63,9 @@ export default function Home() {
           <div className="flex items-center space-x-4 p-4 justify-center">
             {currPlayer != player ? (
               <div>
-                It is {(gameState as gsObj).player_character_mapping[currPlayer]}`&apos;`s turn.
+                It is{" "}
+                {(gameState as gsObj).player_character_mapping[currPlayer]}
+                `&apos;`s turn.
               </div>
             ) : (
               <>
@@ -140,5 +86,5 @@ export default function Home() {
         </SidebarInset>
       </SidebarProvider>
     </GameStateContext.Provider>
-  )
+  );
 }

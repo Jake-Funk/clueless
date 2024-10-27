@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "./ui/select";
 import { useContext, useState } from "react";
-import { GameStateContext } from "@/app/play/page";
+import { GameStateContext } from "@/lib/types";
 
 const availPeople = [
   "Miss Scarlet",
@@ -76,7 +76,7 @@ export default function AccuseBtn() {
     );
     const content = await rawResp.json();
     console.log(content);
-    setTrigger(trigger+1)
+    setTrigger(trigger + 1);
   }
 
   async function answerNo() {
@@ -97,7 +97,7 @@ export default function AccuseBtn() {
     );
     const content = await rawResp.json();
     console.log(content);
-    setTrigger(trigger+1)
+    setTrigger(trigger + 1);
   }
 
   return (
