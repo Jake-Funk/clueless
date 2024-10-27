@@ -14,7 +14,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { GameStateContext } from "@/app/play/page";
+
+import { GameStateContext } from "@/lib/types";
+
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { useToast } from "@/hooks/use-toast";

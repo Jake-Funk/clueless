@@ -27,7 +27,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useContext } from "react";
-import { GameStateContext } from "@/app/play/page";
+import { GameStateContext } from "@/lib/types";
+
 import { Input } from "./ui/input";
 
 export function NavMain() {

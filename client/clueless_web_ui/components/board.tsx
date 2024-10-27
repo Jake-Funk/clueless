@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Separator } from "./ui/separator";
-import { GameStateContext } from "@/app/play/page";
+import { GameStateContext } from "@/lib/types";
 
 export function Board() {
   const { gameState } = useContext(GameStateContext);
@@ -12,8 +12,11 @@ export function Board() {
           <div className="py-1 font-bold">Study</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.study.map((person: string) => {
-              if (person == gameState.map.study.findLast((elem) => elem)) {
+            {(gameState.map.study as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.study as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -28,8 +31,11 @@ export function Board() {
           <div className="py-1 font-bold">Hall</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.hall.map((person: string) => {
-              if (person == gameState.map.hall.findLast((elem) => elem)) {
+            {(gameState.map.hall as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.hall as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -44,8 +50,11 @@ export function Board() {
           <div className="py-1 font-bold">Lounge</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.lounge.map((person: string) => {
-              if (person == gameState.map.lounge.findLast((elem) => elem)) {
+            {(gameState.map.lounge as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.lounge as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -70,8 +79,11 @@ export function Board() {
           <div className="py-1 font-bold">Library</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.library.map((person: string) => {
-              if (person == gameState.map.library.findLast((elem) => elem)) {
+            {(gameState.map.library as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.library as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -86,8 +98,11 @@ export function Board() {
           <div className="py-1 font-bold">Billiard Room</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.billiard.map((person: string) => {
-              if (person == gameState.map.billiard.findLast((elem) => elem)) {
+            {(gameState.map.billiard as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.billiard as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -102,8 +117,11 @@ export function Board() {
           <div className="py-1 font-bold">Dining Room</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.dining.map((person: string) => {
-              if (person == gameState.map.dining.findLast((elem) => elem)) {
+            {(gameState.map.dining as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.dining as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -128,9 +146,12 @@ export function Board() {
           <div className="py-1 font-bold">Conservatory</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.conservatory.map((person: string) => {
+            {(gameState.map.conservatory as string[]).map((person: string) => {
               if (
-                person == gameState.map.conservatory.findLast((elem) => elem)
+                person ==
+                (gameState.map.conservatory as string[]).findLast(
+                  (elem) => elem,
+                )
               ) {
                 return <span key={person}>{person}</span>;
               } else {
@@ -146,8 +167,11 @@ export function Board() {
           <div className="py-1 font-bold">Ballroom</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.ballroom.map((person: string) => {
-              if (person == gameState.map.ballroom.findLast((elem) => elem)) {
+            {(gameState.map.ballroom as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.ballroom as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
@@ -162,8 +186,11 @@ export function Board() {
           <div className="py-1 font-bold">Kitchen</div>
           <Separator />
           <div className="flex w-full flex-wrap gap-1 items-center justify-center p-1">
-            {gameState.map.kitchen.map((person: string) => {
-              if (person == gameState.map.kitchen.findLast((elem) => elem)) {
+            {(gameState.map.kitchen as string[]).map((person: string) => {
+              if (
+                person ==
+                (gameState.map.kitchen as string[]).findLast((elem) => elem)
+              ) {
                 return <span key={person}>{person}</span>;
               } else {
                 return <span key={person}>{person},</span>;
