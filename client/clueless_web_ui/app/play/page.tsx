@@ -9,7 +9,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { createContext, useEffect, useState } from "react"
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react"
 
 const defaultGameState = {
   game_phase: {
@@ -42,14 +42,38 @@ const defaultGameState = {
   },
 }
 
-export const GameStateContext = createContext({
+export interface gsObj {
+  game_phase: {
+    player: string,
+    phase: string,
+  },
+  player_character_mapping: {
+    [key: string]: string;
+  },
+  map: {
+    [key: string | number]: string[] | string;
+  },
+}
+
+interface gsContext {
+  gameState: gsObj,
+  player: string,
+  gameID: string,
+  trigger: number,
+  setTrigger: Dispatch<SetStateAction<number>>
+}
+
+export const GameStateContext = createContext<gsContext>({
   gameState: defaultGameState,
   player: "",
   gameID: "",
+  trigger: 0,
+  setTrigger: ()=>{}
 })
 export default function Home() {
   const [gameID, setGameId] = useState("")
   const [player, setPlayer] = useState("")
+  const [trigger, setTrigger] = useState(0)
   const [gameState, setGameState] = useState(defaultGameState)
   const currPlayer: string = gameState.game_phase.player
   const currPhase: string = gameState.game_phase.phase
@@ -80,10 +104,10 @@ export default function Home() {
     if (gameID) {
       getGameState()
     }
-  }, [gameID])
+  }, [gameID, trigger])
 
   return (
-    <GameStateContext.Provider value={{ gameState, player, gameID }}>
+    <GameStateContext.Provider value={{ gameState, player, gameID, trigger, setTrigger }}>
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset>
@@ -95,7 +119,7 @@ export default function Home() {
           <div className="flex items-center space-x-4 p-4 justify-center">
             {currPlayer != player ? (
               <div>
-                It is {gameState.player_character_mapping[currPlayer]}'s turn.
+                It is {(gameState as gsObj).player_character_mapping[currPlayer]}`&apos;`s turn.
               </div>
             ) : (
               <>

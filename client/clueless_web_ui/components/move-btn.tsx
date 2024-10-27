@@ -16,10 +16,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { useContext, useEffect, useState } from "react";
-import { GameStateContext } from "@/app/play/page";
+import { useContext, useState } from "react";
+import { GameStateContext, gsObj } from "@/app/play/page";
 
-const boardMap = {
+interface mapObj {
+  [key: string | number]: (string|number)[];
+}
+
+const boardMap: mapObj = {
   0: ["study", "hall"],
   1: ["lounge", "hall"],
   2: ["study", "library"],
@@ -44,13 +48,14 @@ const boardMap = {
 };
 
 export default function MoveBtn() {
-  const { gameState, player, gameID } = useContext(GameStateContext);
+  const { gameState, player, gameID, setTrigger, trigger } = useContext(GameStateContext);
+  const [open, setOpen] = useState(false);
   const [selection, setSelection] = useState("");
 
   function getAvailRooms() {
     for (const room in gameState.map) {
       if (
-        gameState.map[room].includes(gameState.player_character_mapping[player])
+        (gameState as gsObj).map[room].includes(gameState.player_character_mapping[player])
       ) {
         return boardMap[room];
       }
@@ -70,11 +75,17 @@ export default function MoveBtn() {
       body: JSON.stringify({ player: player, location: selection, id: gameID }),
     });
     const content = await rawResp.json();
-    console.log(content);
+    if (rawResp.status == 200) {
+      setOpen(false);
+      setTrigger(trigger+1)
+    } else {
+      console.log(content);
+    }
+
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Move</Button>
       </DialogTrigger>
@@ -82,7 +93,7 @@ export default function MoveBtn() {
         <DialogHeader>
           <DialogTitle>Move your Character</DialogTitle>
           <DialogDescription>
-            Select where you want to move here. Click submit when you're done.
+            Select where you want to move here. Click submit when you`&apos;`re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -99,9 +110,9 @@ export default function MoveBtn() {
                 <SelectValue placeholder="Room" />
               </SelectTrigger>
               <SelectContent>
-                {availRooms.map((item: string) => {
+                {availRooms?.map((item: string | number) => {
                   return (
-                    <SelectItem value={item} key={item}>
+                    <SelectItem value={String(item)} key={item}>
                       {item}
                     </SelectItem>
                   );

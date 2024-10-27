@@ -50,7 +50,7 @@ const availWeapons = [
 ];
 
 export default function AccuseBtn() {
-  const { gameState, player, gameID } = useContext(GameStateContext);
+  const { player, gameID, setTrigger, trigger } = useContext(GameStateContext);
   const [person, setPerson] = useState("");
   const [weapon, setWeapon] = useState("");
   const [room, setRoom] = useState("");
@@ -76,10 +76,10 @@ export default function AccuseBtn() {
     );
     const content = await rawResp.json();
     console.log(content);
+    setTrigger(trigger+1)
   }
 
   async function answerNo() {
-    console.log("You declined to make an accusation.");
     const rawResp = await fetch(
       process.env.NEXT_PUBLIC_SERVER_URL + `/accusation`,
       {
@@ -97,6 +97,7 @@ export default function AccuseBtn() {
     );
     const content = await rawResp.json();
     console.log(content);
+    setTrigger(trigger+1)
   }
 
   return (
@@ -111,7 +112,7 @@ export default function AccuseBtn() {
         <DialogHeader>
           <DialogTitle>Accusation</DialogTitle>
           <DialogDescription>
-            Put together your accusation. Click submit when you're done.
+            Put together your accusation. Click submit when you`&apos;`re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

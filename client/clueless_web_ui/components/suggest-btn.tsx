@@ -50,7 +50,7 @@ const availWeapons = [
 ];
 
 export default function SuggestBtn() {
-  const { gameState, player, gameID } = useContext(GameStateContext);
+  const { player, gameID } = useContext(GameStateContext);
   const [person, setPerson] = useState("");
   const [weapon, setWeapon] = useState("");
   const [room, setRoom] = useState("");
@@ -87,7 +87,7 @@ export default function SuggestBtn() {
         <DialogHeader>
           <DialogTitle>Suggestion</DialogTitle>
           <DialogDescription>
-            Put together your suggestion. Click submit when you're done.
+            Put together your suggestion. Click submit when you`&apos;`re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
