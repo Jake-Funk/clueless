@@ -1,6 +1,11 @@
 "use client";
-import { BadgePlus, Github, Search, UserRoundPlus } from "lucide-react";
-import Image from "next/image";
+import {
+  BadgePlus,
+  BookMarked,
+  Github,
+  Search,
+  UserRoundPlus,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -65,13 +70,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
+          <BookMarked width={16} height={16} />
           Rules
         </a>
         <a
