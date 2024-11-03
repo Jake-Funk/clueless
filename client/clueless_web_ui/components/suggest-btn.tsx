@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -7,18 +7,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select"
-import { useContext, useState } from "react"
-import { GameStateContext, gsObj } from "@/lib/types"
-import { useToast } from "@/hooks/use-toast"
+} from "./ui/select";
+import { useContext, useState } from "react";
+import { GameStateContext, gsObj } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 const availPeople = [
   "Miss Scarlet",
@@ -27,7 +27,7 @@ const availPeople = [
   "Mrs. Peacock",
   "Colonel Mustard",
   "Mrs. White",
-]
+];
 
 const availWeapons = [
   "rope",
@@ -36,31 +36,31 @@ const availWeapons = [
   "candlestick",
   "lead pipe",
   "wrench",
-]
+];
 
 export default function SuggestBtn() {
   const { player, gameID, gameState, trigger, setTrigger } =
-    useContext(GameStateContext)
-  const [person, setPerson] = useState("")
-  const [weapon, setWeapon] = useState("")
-  const [open, setOpen] = useState(false)
-  const { toast } = useToast()
-  let room: string
+    useContext(GameStateContext);
+  const [person, setPerson] = useState("");
+  const [weapon, setWeapon] = useState("");
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  let room: string;
 
   for (const tmpRoom in gameState.map) {
     if (
       (gameState as gsObj).map[tmpRoom].includes(
-        gameState.player_character_mapping[player]
+        gameState.player_character_mapping[player],
       )
     ) {
-      room = tmpRoom
+      room = tmpRoom;
     }
   }
 
   async function handleSubmit() {
     console.log(
-      `You chose:\nperson: ${person}\nweapon: ${weapon}\nroom: ${room}`
-    )
+      `You chose:\nperson: ${person}\nweapon: ${weapon}\nroom: ${room}`,
+    );
     const rawResp = await fetch(
       process.env.NEXT_PUBLIC_SERVER_URL + `/suggestion`,
       {
@@ -74,24 +74,24 @@ export default function SuggestBtn() {
           gameKey: gameID,
           statementDetails: { person: person, weapon: weapon, room: room },
         }),
-      }
-    )
-    const content = await rawResp.json()
+      },
+    );
+    const content = await rawResp.json();
     if (rawResp.status == 200) {
-      setOpen(false)
-      setTrigger(trigger + (1 % 10))
+      setOpen(false);
+      setTrigger(trigger + (1 % 10));
       if (content.response) {
-        toast({ description: `${content.player} had ${content.response}` })
+        toast({ description: `${content.player} had ${content.response}` });
       } else {
         toast({
           description:
             "Nobody could disprove your suggestion... Is this a clue?",
-        })
+        });
       }
     } else {
-      console.log(content)
+      console.log(content);
     }
-    console.log(content) // this log should be removed once we have a permanent store of gathered clues.
+    console.log(content); // this log should be removed once we have a permanent store of gathered clues.
   }
 
   return (
@@ -113,7 +113,7 @@ export default function SuggestBtn() {
             </Label>
             <Select
               onValueChange={(e) => {
-                setPerson(e)
+                setPerson(e);
               }}
             >
               <SelectTrigger className="w-[180px]">
@@ -125,7 +125,7 @@ export default function SuggestBtn() {
                     <SelectItem value={item} key={item}>
                       {item}
                     </SelectItem>
-                  )
+                  );
                 })}
               </SelectContent>
             </Select>
@@ -136,7 +136,7 @@ export default function SuggestBtn() {
             </Label>
             <Select
               onValueChange={(e) => {
-                setWeapon(e)
+                setWeapon(e);
               }}
             >
               <SelectTrigger className="w-[180px]">
@@ -148,7 +148,7 @@ export default function SuggestBtn() {
                     <SelectItem value={item} key={item}>
                       {item}
                     </SelectItem>
-                  )
+                  );
                 })}
               </SelectContent>
             </Select>
@@ -161,5 +161,5 @@ export default function SuggestBtn() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
