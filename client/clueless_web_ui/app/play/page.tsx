@@ -1,32 +1,32 @@
-"use client";
-import AccuseBtn from "@/components/accuse-btn";
-import { AppSidebar } from "@/components/app-sidebar";
-import { Board } from "@/components/board";
-import MoveBtn from "@/components/move-btn";
-import SuggestBtn from "@/components/suggest-btn";
+"use client"
+import AccuseBtn from "@/components/accuse-btn"
+import { AppSidebar } from "@/components/app-sidebar"
+import { Board } from "@/components/board"
+import MoveBtn from "@/components/move-btn"
+import SuggestBtn from "@/components/suggest-btn"
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar";
-import { defaultGameState, GameStateContext, gsObj } from "@/lib/types";
-import { useEffect, useState } from "react";
+} from "@/components/ui/sidebar"
+import { defaultGameState, GameStateContext, gsObj } from "@/lib/types"
+import { useEffect, useState } from "react"
 
 export default function Home() {
-  const [gameID, setGameId] = useState("");
-  const [player, setPlayer] = useState("");
-  const [trigger, setTrigger] = useState(0);
-  const [gameState, setGameState] = useState(defaultGameState);
-  const currPlayer: string = gameState.game_phase.player;
-  const currPhase: string = gameState.game_phase.phase;
+  const [gameID, setGameId] = useState("")
+  const [player, setPlayer] = useState("")
+  const [trigger, setTrigger] = useState(0)
+  const [gameState, setGameState] = useState(defaultGameState)
+  const currPlayer: string = gameState.game_phase.player
+  const currPhase: string = gameState.game_phase.phase
 
   useEffect(() => {
-    const value = localStorage.getItem("gameID") || "";
-    setGameId(value);
+    const value = localStorage.getItem("gameID") || ""
+    setGameId(value)
 
-    const playerNo = localStorage.getItem("player") || "";
-    setPlayer(playerNo);
-  }, []);
+    const playerNo = localStorage.getItem("player") || ""
+    setPlayer(playerNo)
+  }, [])
 
   useEffect(() => {
     async function getGameState() {
@@ -38,15 +38,16 @@ export default function Home() {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-        },
-      );
-      const content = await rawResp.json();
-      setGameState(content);
+        }
+      )
+      const content = await rawResp.json()
+      console.log(content) // this is for development use only and should be removed for the target inc (probably)
+      setGameState(content)
     }
     if (gameID) {
-      getGameState();
+      getGameState()
     }
-  }, [gameID, trigger]);
+  }, [gameID, trigger])
 
   return (
     <GameStateContext.Provider
@@ -65,7 +66,7 @@ export default function Home() {
               <div>
                 It is{" "}
                 {(gameState as gsObj).player_character_mapping[currPlayer]}
-                `&apos;`s turn.
+                &apos;s turn.
               </div>
             ) : (
               <>
@@ -82,9 +83,11 @@ export default function Home() {
             )}
           </div>
           <Board />
-          <pre>{JSON.stringify(gameState, null, 2)}</pre>
+          {process.env.NODE_ENV === "development" && (
+            <pre>{JSON.stringify(gameState, null, 2)}</pre>
+          )}
         </SidebarInset>
       </SidebarProvider>
     </GameStateContext.Provider>
-  );
+  )
 }

@@ -24,8 +24,12 @@ export function Board() {
             })}
           </div>
         </div>
-        <div className="border h-32 bg-muted">
-          <div>{gameState.map["0"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 0</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["0"][0]}
+          </div>
         </div>
         <div className="border h-32 flex flex-col items-center">
           <div className="py-1 font-bold">Hall</div>
@@ -43,8 +47,12 @@ export function Board() {
             })}
           </div>
         </div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["1"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 1</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["1"][0]}
+          </div>
         </div>
         <div className="border h-32 flex flex-col items-center">
           <div className="py-1 font-bold">Lounge</div>
@@ -63,16 +71,28 @@ export function Board() {
           </div>
         </div>
 
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["2"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 2</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["2"][0]}
+          </div>
         </div>
         <div className="border h-32 bg-muted-foreground"></div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["3"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 3</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["3"][0]}
+          </div>
         </div>
         <div className="border h-32 bg-muted-foreground"></div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["4"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 4</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["4"][0]}
+          </div>
         </div>
 
         <div className="border h-32 flex flex-col items-center">
@@ -91,8 +111,12 @@ export function Board() {
             })}
           </div>
         </div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["5"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 5</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["5"][0]}
+          </div>
         </div>
         <div className="border h-32 flex flex-col items-center">
           <div className="py-1 font-bold">Billiard Room</div>
@@ -110,8 +134,12 @@ export function Board() {
             })}
           </div>
         </div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["6"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 6</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["6"][0]}
+          </div>
         </div>
         <div className="border h-32 flex flex-col items-center">
           <div className="py-1 font-bold">Dining Room</div>
@@ -130,16 +158,28 @@ export function Board() {
           </div>
         </div>
 
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["7"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 7</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["7"][0]}
+          </div>
         </div>
         <div className="border h-32 bg-muted-foreground"></div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["8"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 8</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["8"][0]}
+          </div>
         </div>
         <div className="border h-32 bg-muted-foreground"></div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["9"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 9</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["9"][0]}
+          </div>
         </div>
 
         <div className="border h-32 flex flex-col items-center overflow-hidden">
@@ -160,8 +200,12 @@ export function Board() {
             })}
           </div>
         </div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["10"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 10</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["10"][0]}
+          </div>
         </div>
         <div className="border h-32 flex flex-col items-center">
           <div className="py-1 font-bold">Ballroom</div>
@@ -179,8 +223,12 @@ export function Board() {
             })}
           </div>
         </div>
-        <div className="border h-32 bg-muted flex items-center justify-center">
-          <div>{gameState.map["11"][0]}</div>
+        <div className="border h-32 bg-muted flex flex-col items-center">
+          <div className="py-1 font-bold">hallway 11</div>
+          <Separator />
+          <div className="flex items-center justify-center">
+            {gameState.map["11"][0]}
+          </div>
         </div>
         <div className="border h-32 flex flex-col items-center">
           <div className="py-1 font-bold">Kitchen</div>

@@ -112,7 +112,7 @@ export default function AccuseBtn() {
         <DialogHeader>
           <DialogTitle>Accusation</DialogTitle>
           <DialogDescription>
-            Put together your accusation. Click submit when you`&apos;`re done.
+            Put together your accusation. Click submit when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
