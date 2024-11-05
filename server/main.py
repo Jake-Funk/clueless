@@ -182,13 +182,13 @@ async def makeAccusation(accusation: Statement):
         else:
             logging.info(f"{accusation.player}'s accusation was not correct.")
             logging.info("They will remain to provide input on suggestions.")
+            game.next_player()
             # Remove player and transition to the next one
             game.moveable_players.remove(accusation.player)
             if len(game.moveable_players) == 0:
                 logging.info("No Players left to make correct accusations.")
                 logging.info("*****Game Over*****")
                 game.victory_state = EndGameEnum.no_winners
-            game.next_player()
             game.current_turn.phase = "move"
 
     return game.victory_state
