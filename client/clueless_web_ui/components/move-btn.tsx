@@ -95,7 +95,7 @@ export default function MoveBtn() {
         <DialogHeader>
           <DialogTitle>Move your Character</DialogTitle>
           <DialogDescription>
-            Select where you want to move here. Click submit when you`&apos;`re
+            Select where you want to move here. Click submit when you&apos;re
             done.
           </DialogDescription>
         </DialogHeader>
@@ -116,7 +116,7 @@ export default function MoveBtn() {
                 {availRooms?.map((item: string | number) => {
                   return (
                     <SelectItem value={String(item)} key={item}>
-                      {item}
+                      {typeof item === "number" ? `hallway ${item}` : item}
                     </SelectItem>
                   );
                 })}

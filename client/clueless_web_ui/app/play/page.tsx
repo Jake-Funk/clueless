@@ -41,6 +41,7 @@ export default function Home() {
         },
       );
       const content = await rawResp.json();
+      console.log(content); // this is for development use only and should be removed for the target inc (probably)
       setGameState(content);
     }
     if (gameID) {
@@ -65,7 +66,7 @@ export default function Home() {
               <div>
                 It is{" "}
                 {(gameState as gsObj).player_character_mapping[currPlayer]}
-                `&apos;`s turn.
+                &apos;s turn.
               </div>
             ) : (
               <>
@@ -82,7 +83,9 @@ export default function Home() {
             )}
           </div>
           <Board />
-          <pre>{JSON.stringify(gameState, null, 2)}</pre>
+          {process.env.NODE_ENV === "development" && (
+            <pre>{JSON.stringify(gameState, null, 2)}</pre>
+          )}
         </SidebarInset>
       </SidebarProvider>
     </GameStateContext.Provider>
