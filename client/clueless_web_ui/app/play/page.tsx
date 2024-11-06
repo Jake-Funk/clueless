@@ -2,6 +2,7 @@
 import AccuseBtn from "@/components/accuse-btn";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Board } from "@/components/board";
+import EndGame from "@/components/end-game";
 import MoveBtn from "@/components/move-btn";
 import SuggestBtn from "@/components/suggest-btn";
 import {
@@ -61,30 +62,36 @@ export default function Home() {
               <SidebarTrigger className="-ml-1" />
             </div>
           </header>
-          <div className="flex items-center space-x-4 p-4 justify-center">
-            {currPlayer != player ? (
-              <div>
-                It is{" "}
-                {(gameState as gsObj).player_character_mapping[currPlayer]}
-                &apos;s turn.
-              </div>
-            ) : (
-              <>
-                <div>It is your turn.</div>
-                {currPhase == "move" && <MoveBtn />}
-                {currPhase == "suggest" && <SuggestBtn />}
-                {currPhase == "accuse" && (
+          {gameState.victory_state == 0 ? (
+            <>
+              <div className="flex items-center space-x-4 p-4 justify-center">
+                {currPlayer != player ? (
+                  <div>
+                    It is{" "}
+                    {(gameState as gsObj).player_character_mapping[currPlayer]}
+                    &apos;s turn.
+                  </div>
+                ) : (
                   <>
-                    <div>Do you want to make an accusation?</div>
-                    <AccuseBtn />
+                    <div>It is your turn.</div>
+                    {currPhase == "move" && <MoveBtn />}
+                    {currPhase == "suggest" && <SuggestBtn />}
+                    {currPhase == "accuse" && (
+                      <>
+                        <div>Do you want to make an accusation?</div>
+                        <AccuseBtn />
+                      </>
+                    )}
                   </>
                 )}
-              </>
-            )}
-          </div>
-          <Board />
-          {process.env.NODE_ENV === "development" && (
-            <pre>{JSON.stringify(gameState, null, 2)}</pre>
+              </div>
+              <Board />
+              {process.env.NODE_ENV === "development" && (
+                <pre>{JSON.stringify(gameState, null, 2)}</pre>
+              )}
+            </>
+          ) : (
+            <EndGame />
           )}
         </SidebarInset>
       </SidebarProvider>
