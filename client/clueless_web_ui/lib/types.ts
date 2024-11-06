@@ -5,6 +5,7 @@ export const defaultGameState = {
     player: "",
     phase: "",
   },
+  victory_state: 0,
   player_character_mapping: {},
   map: {
     study: [],
@@ -36,6 +37,7 @@ export interface gsObj {
     player: string;
     phase: string;
   };
+  victory_state: number;
   player_character_mapping: {
     [key: string]: string;
   };

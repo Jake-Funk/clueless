@@ -149,7 +149,7 @@ export default function AccuseBtn() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Person" />
+                <SelectValue placeholder="Weapon" />
               </SelectTrigger>
               <SelectContent>
                 {availWeapons.map((item: string) => {
@@ -172,7 +172,7 @@ export default function AccuseBtn() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Person" />
+                <SelectValue placeholder="Room" />
               </SelectTrigger>
               <SelectContent>
                 {availRooms.map((item: string) => {
