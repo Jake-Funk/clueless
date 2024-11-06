@@ -132,9 +132,26 @@ class GameState:
         self.map[HallEnum.lib_to_conservatory] = [PlayerEnum.mrs_peacock]
         self.map[HallEnum.study_to_lib] = [PlayerEnum.prof_plum]
 
+        # A Map to store if a Player was moved forcibly by a suggestion
+        self.moved_by_suggest: Dict[PlayerEnum, bool] = {}
+        for character in list(PlayerEnum):
+            self.moved_by_suggest[player] = False
+
         self.victory_state = EndGameEnum.keep_playing
 
         self.log: list[GameEvent] = []
+
+    def set_player_moved_by_suggest(self, player: PlayerEnum) -> None:
+        """
+        A utility function to mark a player as being moved by a suggestion
+        """
+        self.moved_by_suggest[player] = True
+
+    def reset_player_moved_by_suggest(self, player: PlayerEnum) -> None:
+        """
+        A utility function to reset a player having been moved by a suggestion
+        """
+        self.moved_by_suggest[player] = False
 
     def deal_remaining_cards(self, num_players: int) -> list[list[str]]:
         """
@@ -216,6 +233,7 @@ class GameState:
         outputDict["solution"]["room"] = self.solution.room
 
         outputDict["player_character_mapping"] = self.player_character_mapping
+        outputDict["moved_by_suggest"] = self.moved_by_suggest
 
         outputDict["victory_state"] = self.victory_state
 

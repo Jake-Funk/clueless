@@ -94,6 +94,13 @@ async def move(movement: MoveAction):
     except Exception:
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
+    # If the player's character is marked as having been moved by a suggestion,
+    # reset it here. The default is false, so setting it to false is technically
+    # faster than also adding a conditional
+    currentGame.reset_player_moved_by_suggest(
+        games[key].player_character_mapping[movement.player]
+    )
+
     http_code = validate_move(movement, current_location, games[key])
 
     if http_code[0] == HttpEnum.good:
@@ -254,6 +261,11 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             status_code=HttpEnum.not_found, detail="Suggestor is unknown to the game"
         )
 
+    # If the player's character is marked as having been moved by a suggestion,
+    # reset it here. The default is false, so setting it to false is technically
+    # faster than also adding a conditional
+    currentGame.reset_player_moved_by_suggest(playersCharacter)
+
     # Ensure the suggestor is in the same room as the suggestion they are making
     # Satisfies game requirement
     if get_character_location(playersCharacter, currentGame) != suggestion.room:
@@ -263,7 +275,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made",
         )
 
-        # move the target player to the suggested room
+    # move the target player to the suggested room
     # get current room
     movingPlayerCurrentLocation = get_character_location(suggestion.person, currentGame)
     # create a move object of the suggestion movement
@@ -275,6 +287,12 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
         current_location=movingPlayerCurrentLocation,
         gs=currentGame,
     )
+
+    # Mark the Targeted player as having been moved by a suggestion
+    logger.info(
+        f"{suggestion.person} is being marked as having been moved by suggestion"
+    )
+    currentGame.set_player_moved_by_suggest(suggestion.person)
 
     # after move update the game state dictionary
     currentGameDict = currentGame.dump_to_dict()
