@@ -135,7 +135,7 @@ class GameState:
         # A Map to store if a Player was moved forcibly by a suggestion
         self.moved_by_suggest: Dict[PlayerEnum, bool] = {}
         for character in list(PlayerEnum):
-            self.moved_by_suggest[player] = False
+            self.moved_by_suggest[character] = False
 
         self.victory_state = EndGameEnum.keep_playing
 
