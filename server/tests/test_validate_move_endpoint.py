@@ -1,17 +1,12 @@
 from fastapi.testclient import TestClient
 from util.game_state import GameState
 from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum
+from tests.util_functions import get_new_default_game_key
 import pytest
 
 from main import app, games
 
 client = TestClient(app)
-
-
-def get_new_default_game_key(num: int):
-    new_game = client.post("/new_game/", json={"num_players": num})
-    key = new_game.json()
-    return key
 
 
 def test_bad_validate_move_key():
