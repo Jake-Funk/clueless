@@ -10,12 +10,21 @@ client = TestClient(app)
 
 @pytest.mark.parametrize("bad_num", [1, 10])
 def test_bad_validate_move(bad_num: int):
+    """
+    Test that creating a game with an invalid
+    number of players leads to a 403 message
+    """
     response = client.post("/new_game/", json={"num_players": bad_num})
     assert response.status_code == 403
 
 
 @pytest.mark.parametrize("num", [2, 3, 4, 5, 6])
 def test_good_validate_move(num: int):
+    """
+    Test that creating a game with a valid number of players will
+    return a 200 message and create the key for a populated GameState
+    object
+    """
     response = client.post("/new_game/", json={"num_players": num})
     assert response.status_code == 200
 

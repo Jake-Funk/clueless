@@ -10,6 +10,9 @@ client = TestClient(app)
 
 
 def test_bad_key_accuse():
+    """
+    Check that a bad game key will return a 404
+    """
     response = client.post(
         "/accusation/",
         json={
@@ -26,6 +29,10 @@ def test_bad_key_accuse():
 
 
 def test_good_no_accusation():
+    """
+    Test that not inputting an accusation will move the game to the
+    next player
+    """
     key = get_new_default_game_key(2)
     response = client.post(
         "/accusation/",
@@ -39,9 +46,14 @@ def test_good_no_accusation():
     # Check the game has moved to the next player (1 from 0) and movement phase
     assert games[key].current_turn.player == 1
     assert games[key].current_turn.phase == "move"
+    assert games[key].victory_state == 0
 
 
 def test_good_correct_accusation():
+    """
+    Test that a correct accusation will change the victory_state to 2
+    and perform the correct actions
+    """
     key = get_new_default_game_key(2)
     response = client.post(
         "/accusation/",
@@ -65,6 +77,10 @@ def test_good_correct_accusation():
 
 
 def test_good_bad_accusation():
+    """
+    Test that performing bad accusations performs the correct
+    sequence of actions and ends up changing victory_state to 1
+    """
     key = get_new_default_game_key(2)
     # Guarantee that the requested character is wrong
     player = PlayerEnum.prof_plum

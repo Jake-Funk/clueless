@@ -45,6 +45,9 @@ def test_get_player_default_locations(player: str):
 
 
 def test_bad_key_move():
+    """
+    Check that a bad game key will return a 404
+    """
     response = client.post(
         "move/", json={"player": "player1", "location": RoomEnum.lounge, "id": "bad"}
     )
@@ -52,6 +55,9 @@ def test_bad_key_move():
 
 
 def test_bad_player_move():
+    """
+    Check that a bad player name will return a 404
+    """
     key = get_new_default_game_key(2)
     response = client.post(
         "/move", json={"player": "player0", "location": RoomEnum.lounge, "id": key}
@@ -63,7 +69,7 @@ def test_movement():
     """
     Test to check that the move_player function removes
     the player from the old location and adds them to
-    the new location and validates movement
+    the new location and validates the movement logic
     """
     key = get_new_default_game_key(2)
 
