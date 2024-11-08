@@ -18,6 +18,7 @@ import {
 } from "./ui/select";
 import { useContext, useState } from "react";
 import { GameStateContext, gsObj } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface mapObj {
   [key: string | number]: (string | number)[];
@@ -52,6 +53,7 @@ export default function MoveBtn() {
     useContext(GameStateContext);
   const [open, setOpen] = useState(false);
   const [selection, setSelection] = useState("");
+  const { toast } = useToast();
 
   function getAvailRooms() {
     for (const room in gameState.map) {
@@ -83,6 +85,9 @@ export default function MoveBtn() {
       setTrigger(trigger + 1);
     } else {
       console.log(content);
+      if (content.detail == "Cannot move to an occupied hallway.") {
+        toast({ description: content.detail });
+      }
     }
   }
 
