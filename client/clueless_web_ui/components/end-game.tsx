@@ -18,19 +18,38 @@ export default function EndGame() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] overflow-hidden">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <div className="flex items-center gap-4">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-            {player == gameState.game_phase.player
-              ? "You Won!"
-              : `${gameState.game_phase.player} is the Winner!`}
-          </h1>
-          <Search className={iconClasses} size={40} />
-        </div>
-        <div className="text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          {player == gameState.game_phase.player
-            ? "Great work gathering clues!"
-            : "Better luck next time!"}
-        </div>
+        {gameState.victory_state == 2 ? (
+          <>
+            <div className="flex items-center gap-4">
+              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+                {player == gameState.game_phase.player
+                  ? "You Won!"
+                  : `${gameState.game_phase.player} is the Winner!`}
+              </h1>
+              <Search className={iconClasses} size={40} />
+            </div>
+            <div className="text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+              {player == gameState.game_phase.player
+                ? "Great work gathering clues!"
+                : "Better luck next time!"}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-4">
+              <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+                OH NO!
+              </h1>
+              <Search className={iconClasses} size={40} />
+            </div>
+            <div className="text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+              Looks like the killer got away this time, nobody was able to
+              correctly guess the culprit.
+              <br />
+              Better luck next time!
+            </div>
+          </>
+        )}
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <Link href="/new_game" onClick={(e) => handleClick(e, "new_game")}>
