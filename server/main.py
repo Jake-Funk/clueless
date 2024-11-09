@@ -14,6 +14,7 @@ import uuid
 import logging
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -233,7 +234,11 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     else:
         gameKey = playerSuggestion.gameKey
 
-    if not playerSuggestion.statementDetails:
+    if not (
+        playerSuggestion.statementDetails.person
+        or playerSuggestion.statementDetails.weapon
+        or playerSuggestion.statementDetails.room
+    ):
         raise HTTPException(
             status_code=HttpEnum.bad_request, detail="suggestion details unspecified"
         )
