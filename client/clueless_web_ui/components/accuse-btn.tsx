@@ -18,6 +18,7 @@ import {
 } from "./ui/select";
 import { useContext, useState } from "react";
 import { GameStateContext } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 const availPeople = [
   "Miss Scarlet",
@@ -54,6 +55,8 @@ export default function AccuseBtn() {
   const [person, setPerson] = useState("");
   const [weapon, setWeapon] = useState("");
   const [room, setRoom] = useState("");
+  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
 
   async function handleSubmit() {
     console.log(
@@ -75,7 +78,16 @@ export default function AccuseBtn() {
       },
     );
     const content = await rawResp.json();
-    console.log(content);
+    if (rawResp.status == 200) {
+      if (content == 0) {
+        toast({
+          description:
+            "Your accusation was wrong, you are now out of the game.",
+        });
+      }
+    } else {
+      console.log("SERVER RETURNED:", content);
+    }
     setTrigger(trigger + 1);
   }
 
@@ -101,7 +113,7 @@ export default function AccuseBtn() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Yes</Button>
       </DialogTrigger>
