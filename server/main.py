@@ -234,7 +234,11 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     else:
         gameKey = playerSuggestion.gameKey
 
-    if not playerSuggestion.statementDetails:
+    if not (
+        playerSuggestion.statementDetails.person
+        or playerSuggestion.statementDetails.weapon
+        or playerSuggestion.statementDetails.room
+    ):
         raise HTTPException(
             status_code=HttpEnum.bad_request, detail="suggestion details unspecified"
         )
