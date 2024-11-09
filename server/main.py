@@ -101,7 +101,7 @@ async def move(movement: MoveAction):
     # If the player's character is marked as having been moved by a suggestion,
     # reset it here. The default is false, so setting it to false is technically
     # faster than also adding a conditional
-    currentGame.reset_player_moved_by_suggest(
+    games[key].reset_player_moved_by_suggest(
         games[key].player_character_mapping[movement.player]
     )
 
