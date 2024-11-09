@@ -14,6 +14,7 @@ import uuid
 import logging
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -63,15 +64,18 @@ async def check_valid_move(gameKey: str, player: str):
     except Exception:
         raise HTTPException(status_code=404, detail=f"{player} not found on Map.")
 
-    # Check if there exists a possible move
-    if not does_possible_move_exist(current_location, games[gameKey]):
-        games[gameKey].next_player()
-        raise HTTPException(status_code=403, detail=f"{player} has no possible move.")
-
     # Check if the player can make an action
     if player not in games[gameKey].moveable_players:
+        logger.info(f"{player} cannot take actions, moving to next player")
         games[gameKey].next_player()
-        raise HTTPException(status_code=403, detail=f"{player} cannot make a move.")
+    elif (
+        not does_possible_move_exist(current_location, games[gameKey])
+        and player in games[gameKey].moveable_players
+    ):
+        logger.info(
+            f"{player} has no available move options, going to Accusation phase"
+        )
+        games[gameKey].current_turn.phase = "accuse"
 
 
 @app.post("/move")
@@ -118,7 +122,8 @@ async def move(movement: MoveAction):
             logging.info(f"Moving {movement.player} to {movement.location}")
             logging.info(f"{movement.player} can now make a suggestion")
         else:
-            games[key].next_player()
+            # Players in Hallways can still make Accusations
+            games[key].current_turn.phase = "accuse"
             logging.info(f"{movement.player} moved to a Hallway, going to next player")
 
         return {
@@ -236,7 +241,11 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     else:
         gameKey = playerSuggestion.gameKey
 
-    if not playerSuggestion.statementDetails:
+    if not (
+        playerSuggestion.statementDetails.person
+        or playerSuggestion.statementDetails.weapon
+        or playerSuggestion.statementDetails.room
+    ):
         raise HTTPException(
             status_code=HttpEnum.bad_request, detail="suggestion details unspecified"
         )
@@ -312,17 +321,26 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
         # TODO: Future iterations should send a request out to the identified player to show a card if one of the suggestions is in their hand
         playerCards = currentGameDict[p]
 
-        # select the cards that
+        # select the cards that are in the suggestion
         overlapCards = [
             c
             for c in playerCards
             if c in suggestion.person or c in suggestion.weapon or c in suggestion.room
         ]
 
+        # check all overlapping cards for cards that the player has seen before and remove them from the pool of possible cards
+        overlapCards = [
+            c for c in overlapCards if c not in currentGame.playerHasSeen[suggestor]
+        ]
+
         if overlapCards:
             # if there are any overlapping cards, return one of them randomly
             returnDict["response"] = random.choice(overlapCards)
             returnDict["player"] = p
+
+            # add chosen card to the set of seen cards
+            currentGame.playerHasSeen[suggestor].add(returnDict["response"])
+
             # break loop immediately once an overlapping card is found
             break
 
