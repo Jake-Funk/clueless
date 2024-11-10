@@ -132,6 +132,12 @@ class GameState:
         self.map[HallEnum.lib_to_conservatory] = [PlayerEnum.mrs_peacock]
         self.map[HallEnum.study_to_lib] = [PlayerEnum.prof_plum]
 
+        # sets for validating responses for the suggestion endpoint
+        # uses the same keys (e.g., "player1") for cards each player has seen
+        self.playerHasSeen: Dict[str, set] = {}
+        for K in self.player_character_mapping.keys():
+            self.playerHasSeen[K] = set()
+
         self.victory_state = EndGameEnum.keep_playing
 
         self.log: list[GameEvent] = []
