@@ -272,7 +272,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made",
         )
 
-        # move the target player to the suggested room
+    # move the target player to the suggested room
     # get current room
     movingPlayerCurrentLocation = get_character_location(suggestion.person, currentGame)
     # create a move object of the suggestion movement
@@ -303,17 +303,26 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
         # TODO: Future iterations should send a request out to the identified player to show a card if one of the suggestions is in their hand
         playerCards = currentGameDict[p]
 
-        # select the cards that
+        # select the cards that are in the suggestion
         overlapCards = [
             c
             for c in playerCards
             if c in suggestion.person or c in suggestion.weapon or c in suggestion.room
         ]
 
+        # check all overlapping cards for cards that the player has seen before and remove them from the pool of possible cards
+        overlapCards = [
+            c for c in overlapCards if c not in currentGame.playerHasSeen[suggestor]
+        ]
+
         if overlapCards:
             # if there are any overlapping cards, return one of them randomly
             returnDict["response"] = random.choice(overlapCards)
             returnDict["player"] = p
+
+            # add chosen card to the set of seen cards
+            currentGame.playerHasSeen[suggestor].add(returnDict["response"])
+
             # break loop immediately once an overlapping card is found
             break
 
