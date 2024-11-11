@@ -239,6 +239,6 @@ class GameState:
         }
 
         # return the dictionary of cards the players have been shown
-        outputDict['playerHasSeen'] = self.playerHasSeen
+        outputDict["playerHasSeen"] = self.playerHasSeen
 
         return outputDict
