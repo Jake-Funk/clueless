@@ -2,8 +2,6 @@ from util.game_state import GameState
 from util.enums import PlayerEnum, RoomEnum, HallEnum, HttpEnum
 from util.actions import MoveAction
 
-# from util.game_state import GameState
-
 
 Map = {
     RoomEnum.study: frozenset(
@@ -64,6 +62,17 @@ Map = {
         [RoomEnum.conservatory, RoomEnum.ballroom]
     ),
     HallEnum.ballroom_to_kitchen: frozenset([RoomEnum.ballroom, RoomEnum.kitchen]),
+    # Staging room holds characters not assigned to players
+    RoomEnum.staging: frozenset(
+        [
+            HallEnum.hall_to_lounge,
+            HallEnum.lounge_to_dining,
+            HallEnum.ballroom_to_kitchen,
+            HallEnum.conservatory_to_ballroom,
+            HallEnum.lib_to_conservatory,
+            HallEnum.study_to_lib,
+        ]
+    ),
 }
 
 

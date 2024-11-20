@@ -32,6 +32,7 @@ class RoomEnum(str, Enum):
     conservatory = "conservatory"
     ballroom = "ballroom"
     kitchen = "kitchen"
+    staging = "Staging"
 
 
 class HallEnum(IntEnum):

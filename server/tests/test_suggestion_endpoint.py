@@ -98,6 +98,7 @@ def test_bad_player_not_in_same_room_suggest():
     as the suggestor, a HTTP 403 message is returned
     """
     key = get_new_default_game_key(2)
+    games[key].current_turn.phase = "suggest"
     response = client.post(
         "/suggestion/",
         json={
@@ -118,11 +119,12 @@ def test_good_suggestion_moves_other_character():
     Test to check a valid suggestion properly moves the
     suggested character
     """
-    key = get_new_default_game_key(2)
+    key = get_new_default_game_key(6)
     client.post(
         "/move", json={"player": "player1", "location": RoomEnum.lounge, "id": key}
     )
     # Check the lounge only has 1 player in it
+    games[key].current_turn.phase = "suggest"
     assert len(games[key].map[RoomEnum.lounge]) == 1
     old_location = get_character_location(PlayerEnum.prof_plum, games[key])
     response = client.post(
@@ -140,7 +142,8 @@ def test_good_suggestion_moves_other_character():
     assert response.status_code == 200
 
     # Check the suggested character has been moved
-    assert len(games[key].map[old_location]) == 0
+    if old_location != RoomEnum.staging:
+        assert len(games[key].map[old_location]) == 0
     assert len(games[key].map[RoomEnum.lounge]) == 2
     assert games[key].current_turn.phase == "accuse"
 
@@ -150,7 +153,7 @@ def test_good_suggestion_of_same_character_does_not_copy_them():
     Test to check a valid suggestion which suggests the same character
     as the player does not copy the character in the same location
     """
-    key = get_new_default_game_key(2)
+    key = get_new_default_game_key(6)
     client.post(
         "/move", json={"player": "player1", "location": RoomEnum.lounge, "id": key}
     )
@@ -181,7 +184,7 @@ def test_good_suggestion_returns_card_or_no_card_if_solution_or_hand():
     that all elements in the suggestion are either in the player's hand or in the
     game solution
     """
-    key = get_new_default_game_key(2)
+    key = get_new_default_game_key(6)
     client.post(
         "/move", json={"player": "player1", "location": RoomEnum.lounge, "id": key}
     )
