@@ -5,6 +5,15 @@ from dataclasses import dataclass
 from datetime import datetime
 import random
 
+STARTING_LOCATIONS = {
+    PlayerEnum.miss_scarlet: HallEnum.hall_to_lounge,
+    PlayerEnum.col_mustard: HallEnum.lounge_to_dining,
+    PlayerEnum.mrs_white: HallEnum.ballroom_to_kitchen,
+    PlayerEnum.mr_green: HallEnum.conservatory_to_ballroom,
+    PlayerEnum.mrs_peacock: HallEnum.lib_to_conservatory,
+    PlayerEnum.prof_plum: HallEnum.study_to_lib,
+}
+
 
 class TurnPhase(str, Enum):
     move = "move"
@@ -125,12 +134,7 @@ class GameState:
             self.map[item] = []
 
         # Starting Player locations
-        self.map[HallEnum.hall_to_lounge] = [PlayerEnum.miss_scarlet]
-        self.map[HallEnum.lounge_to_dining] = [PlayerEnum.col_mustard]
-        self.map[HallEnum.ballroom_to_kitchen] = [PlayerEnum.mrs_white]
-        self.map[HallEnum.conservatory_to_ballroom] = [PlayerEnum.mr_green]
-        self.map[HallEnum.lib_to_conservatory] = [PlayerEnum.mrs_peacock]
-        self.map[HallEnum.study_to_lib] = [PlayerEnum.prof_plum]
+        self.set_player_positions()
 
         # A Map to store if a Player was moved forcibly by a suggestion
         self.moved_by_suggest: Dict[PlayerEnum, bool] = {}
@@ -146,6 +150,21 @@ class GameState:
         self.victory_state = EndGameEnum.keep_playing
 
         self.log: list[GameEvent] = []
+
+    def set_player_positions(self) -> None:
+        """
+        Utility function to set starting character positions
+        """
+        characters_chosen = []
+        for player in self.player_order:
+            character = self.player_character_mapping[player]
+            self.map[STARTING_LOCATIONS[character]] = [character]
+            characters_chosen.append(character)
+
+        if len(characters_chosen) != 6:
+            for character in list(PlayerEnum):
+                if character not in characters_chosen:
+                    self.map[RoomEnum.staging].append(character)
 
     def set_player_moved_by_suggest(self, player: PlayerEnum) -> None:
         """

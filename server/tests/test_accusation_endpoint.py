@@ -34,6 +34,7 @@ def test_good_no_accusation():
     next player
     """
     key = get_new_default_game_key(2)
+    games[key].current_turn.phase = "accuse"
     response = client.post(
         "/accusation/",
         json={
@@ -55,6 +56,7 @@ def test_good_correct_accusation():
     and perform the correct actions
     """
     key = get_new_default_game_key(2)
+    games[key].current_turn.phase = "accuse"
     response = client.post(
         "/accusation/",
         json={
@@ -87,6 +89,7 @@ def test_good_bad_accusation():
     if games[key].solution.person == PlayerEnum.prof_plum:
         player = PlayerEnum.miss_scarlet
 
+    games[key].current_turn.phase = "accuse"
     response = client.post(
         "/accusation/",
         json={
@@ -109,6 +112,7 @@ def test_good_bad_accusation():
     assert len(games[key].moveable_players) < 2
 
     # Repeat for second player to trigger no winners end state
+    games[key].current_turn.phase = "accuse"
     response = client.post(
         "/accusation/",
         json={

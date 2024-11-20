@@ -71,7 +71,7 @@ def test_movement():
     the player from the old location and adds them to
     the new location and validates the movement logic
     """
-    key = get_new_default_game_key(2)
+    key = get_new_default_game_key(6)
 
     # Check valid move of Miss Scarlet to Lounge
     response = client.post(

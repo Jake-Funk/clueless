@@ -169,6 +169,12 @@ async def makeAccusation(accusation: Statement):
         raise HTTPException(status_code=404, detail="Game not found.")
     game = games[accusation.gameKey]
 
+    if game.current_turn.phase != "accuse":
+        raise HTTPException(
+            status_code=HttpEnum.bad_request,
+            detail="Game phase not in the accusation phase",
+        )
+
     # If the accusation Statement is all None, no accusation is desired
     # and move to the next player. Not logging as it will be the average action
     accval = accusation.statementDetails
@@ -268,6 +274,12 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     except:
         raise HTTPException(
             status_code=HttpEnum.not_found, detail="Suggestor is unknown to the game"
+        )
+
+    if currentGame.current_turn.phase != "suggest":
+        raise HTTPException(
+            status_code=HttpEnum.bad_request,
+            detail="Game phase not in the suggestion phase",
         )
 
     # If the player's character is marked as having been moved by a suggestion,
