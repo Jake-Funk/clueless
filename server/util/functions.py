@@ -1,5 +1,17 @@
+import datetime
 from util.enums import PlayerEnum, RoomEnum, HallEnum
 from util.game_state import GameState
+
+
+def get_time() -> str:
+    return str(datetime.datetime.now().time())
+
+
+def location_str(location: RoomEnum | HallEnum) -> str:
+    if type(location) is RoomEnum:
+        return location.value
+    else:
+        return f"hallway{location.value}"
 
 
 def get_character_location(

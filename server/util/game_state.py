@@ -145,7 +145,7 @@ class GameState:
 
         self.victory_state = EndGameEnum.keep_playing
 
-        self.log: list[GameEvent] = []
+        self.logs: list[GameEvent] = []
 
     def set_player_moved_by_suggest(self, player: PlayerEnum) -> None:
         """
@@ -258,5 +258,7 @@ class GameState:
 
         # return the dictionary of cards the players have been shown
         outputDict["playerHasSeen"] = self.playerHasSeen
+
+        outputDict["logs"] = self.logs
 
         return outputDict

@@ -4,13 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from util.game_state import GameState
 from util.enums import RoomEnum, HttpEnum, EndGameEnum
 from util.actions import NewGameRequest, MoveAction, Statement
-from util.functions import get_character_location
+from util.functions import get_character_location, get_time, location_str
 from util.movement import Map, move_player, validate_move, does_possible_move_exist
 import random
 
 import uuid
 
-# TODO: Potentially use this for our logging system?
 import logging
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.DEBUG)
@@ -42,6 +41,7 @@ async def initialize_game(req: NewGameRequest) -> str:
         raise HTTPException(status_code=403, detail="Invalid number of players.")
 
     key = str(uuid.uuid4())
+    logger.debug(f"Creating Game State of ID: {key}")
     games[key] = temp
     return key
 
@@ -124,8 +124,13 @@ async def move(movement: MoveAction):
         else:
             # Players in Hallways can still make Accusations
             games[key].current_turn.phase = "accuse"
-            logging.info(f"{movement.player} moved to a Hallway, going to next player")
+            logging.info(
+                f"{movement.player} moved to a Hallway, going to Accusation phase"
+            )
 
+        games[key].logs.append(
+            f"{get_time()} - {movement.player} moved to {location_str(movement.location)}."
+        )
         return {
             "Response": f"Successfully moved {movement.player} to {movement.location.value}. Moving to next Player."
         }
@@ -170,19 +175,28 @@ async def makeAccusation(accusation: Statement):
     game = games[accusation.gameKey]
 
     # If the accusation Statement is all None, no accusation is desired
-    # and move to the next player. Not logging as it will be the average action
+    # and move to the next player.
     accval = accusation.statementDetails
     if not (accval.person or accval.weapon or accval.room):
+        log_str = f"{accusation.player} opted to not make an accusation."
+        logger.info(log_str)
+        game.logs.append(f"{get_time()} - " + log_str)
         # Move game to the next player and the move phase
         game.next_player()
         game.current_turn.phase = "move"
     else:
+        game.logs.append(
+            f"{get_time()} - {accusation.player} made an accusation of {accval.person.value} in {location_str(accval.room)} with the {accval.weapon.value}."
+        )
         # If the accusation is correct, end the game
         if (
             accval.person == game.solution.person
             and accval.weapon == game.solution.weapon
             and accval.room == game.solution.room
         ):
+            game.logs.append(
+                f"{get_time()} - {accusation.player} uncovered all the Clues and won the game!"
+            )
             logging.info(
                 f"{accusation.player} correctly put together the Clues and won the game!"
             )
@@ -192,6 +206,9 @@ async def makeAccusation(accusation: Statement):
         # suggestions; i.e. they cannot move, make suggestions or accusations.
         # Their only purpose is to disprove other suggestions.
         else:
+            game.logs.append(
+                f"{get_time()} - {accusation.player}'s accusation was incorrect; they are now a spectator"
+            )
             logging.info(f"{accusation.player}'s accusation was not correct.")
             logging.info("They will remain to provide input on suggestions.")
             game.next_player()
@@ -289,6 +306,14 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     movingPlayerCurrentLocation = get_character_location(suggestion.person, currentGame)
     # create a move object of the suggestion movement
 
+    # For the sake of being more professional, don't display log
+    # if the suggested person and the player's character are the same
+    if playerSuggestion.player is not suggestion.person:
+        currentGame.logs.append(
+            f"{get_time()} - Moving suggested character {suggestion.person.value} to {location_str(suggestion.room)}"
+        )
+        logger.info(f"Moving suggested player {suggestion.person} to {suggestion.room}")
+
     # execute move
     move_player(
         character=suggestion.person,
@@ -317,6 +342,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     playersList = bottom[1:] + top
 
     # loop through the players in order and check their cards against the suggestion
+    found_card = False
     for p in playersList:
         # TODO: Future iterations should send a request out to the identified player to show a card if one of the suggestions is in their hand
         playerCards = currentGameDict[p]
@@ -341,8 +367,23 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             # add chosen card to the set of seen cards
             currentGame.playerHasSeen[suggestor].add(returnDict["response"])
 
+            currentGame.logs.append(
+                f"{get_time()} - {suggestor}'s suggestion was disproved."
+            )
+            logger.info(
+                f"{suggestor}'s suggestion had a card in an other player's hand."
+            )
+
             # break loop immediately once an overlapping card is found
+            found_card = True
             break
+    if not found_card:
+        currentGame.logs.append(
+            f"{get_time()} - {suggestor}'s suggestion was not disproved."
+        )
+        logger.info(
+            f"{suggestor}'s suggestion did NOT have a card in an other player's hand."
+        )
 
     # change game turn phase
     currentGame.current_turn.phase = "accuse"

@@ -16,6 +16,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+  SidebarContent,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -76,7 +77,7 @@ export function NavMain() {
         {/* Game log section */}
         <Collapsible asChild>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={"Your Cards"}>
+            <SidebarMenuButton asChild tooltip={"Game Log"}>
               <div>
                 <Logs />
                 <span className="cursor-default select-none">Game Log</span>
@@ -91,11 +92,11 @@ export function NavMain() {
                   </SidebarMenuAction>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <SidebarMenuSub>
+                  <SidebarMenuSub className="max-h-72 overflow-y-auto">
                     {gameContext.gameState.logs?.map((subItem: string) => (
                       <SidebarMenuSubItem key={subItem}>
                         <SidebarMenuSubButton asChild>
-                          <span>{subItem}</span>
+                          <span className="block whitespace-pre-wrap break-words w-full h-full">{subItem}</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
