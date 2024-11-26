@@ -280,6 +280,4 @@ class GameState:
 
         outputDict["logs"] = reversed(self.logs)
 
-        outputDict["playerHasSeen"] = self.playerHasSeen
-
         return outputDict
