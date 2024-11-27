@@ -147,7 +147,7 @@ export function NavMain() {
                     {gameContext.gameState.logs?.map((subItem: string) => (
                       <SidebarMenuSubItem key={subItem}>
                         <SidebarMenuSubButton asChild>
-                          <span className="block whitespace-pre-wrap break-words w-full h-full mb-1">{subItem}</span>
+                          <div className="w-full h-full mb-1">{subItem}</div>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -180,7 +180,7 @@ export function NavMain() {
                   {gameContext.gameState.chat?.map((subItem: string) => (
                     <SidebarMenuSubItem key={subItem}>
                       <SidebarMenuSubButton asChild>
-                        <span className="block whitespace-pre-wrap break-words w-full h-full mb-1">{subItem}</span>
+                        <div className="w-full h-full mb-1">{subItem}</div>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}
