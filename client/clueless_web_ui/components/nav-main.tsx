@@ -1,5 +1,7 @@
 "use client";
 
+import {useState } from 'react';
+
 import {
   ChevronRight,
   FileStack,
@@ -32,8 +34,56 @@ import { GameStateContext } from "@/lib/types";
 
 import { Input } from "./ui/input";
 
+export const sendMessage = async (gameID, player, message) => {
+  const response = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + `/chat`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      key: gameID,
+      player: player,
+      message: message,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Request failed');
+  }
+
+  const data = await response.json();
+  return data;  // Return the response data for further processing
+};
+
 export function NavMain() {
   const gameContext = useContext<any>(GameStateContext); // eslint-disable-line
+  const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSendClick = async () => {
+    if (!inputValue) return;  // Prevent sending if input is empty
+
+    setIsLoading(true);
+    setError(null);  // Reset previous errors
+
+    try {
+      const response = await sendMessage(gameContext.gameID, gameContext.player, inputValue);  // Use the external send function
+      console.log('Response:', response);
+      // Optionally update the UI with the response or handle success.
+
+    } catch (err) {
+      setError('Error sending request');
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <SidebarGroup>
@@ -110,7 +160,7 @@ export function NavMain() {
         {/* Game Chat section */}
         <Collapsible asChild>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={"Your Cards"}>
+            <SidebarMenuButton asChild tooltip={"Game Chat"}>
               <div>
                 <MessageCircle />
                 <span className="cursor-default select-none">Chat</span>
@@ -126,7 +176,7 @@ export function NavMain() {
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {gameContext.gameState.logs?.map((subItem: string) => (
+                  {gameContext.gameState.chat?.map((subItem: string) => (
                     <SidebarMenuSubItem key={subItem}>
                       <SidebarMenuSubButton asChild>
                         <span>{subItem}</span>
@@ -138,8 +188,21 @@ export function NavMain() {
                   )}
                 </SidebarMenuSub>
                 <div className="flex items-center gap-2 px-6">
-                  <Input />
-                  <Send className="cursor-pointer hover:text-sidebar-primary" />
+                  <Input 
+                    type="text"
+                    className="input-class"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    placeholder="Enter message"
+                  />
+                   <button
+                    className="cursor-pointer hover:text-sidebar-primary"
+                    onClick={handleSendClick}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Sending...' : 'Send'}
+                  </button>
+                  {error && <div className="text-red-500">{error}</div>}
                 </div>
               </CollapsibleContent>
             </>

@@ -401,6 +401,26 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     currentGame.current_turn.phase = "accuse"
     return returnDict
 
+@app.post("/chat", status_code=200)
+async def formChat(key: str, player: str, message: str):
+    """
+    Endpoint to form a chat message
+    """
+    print(key)
+    print(player)
+    print(message)
+    # get the game state information
+    if key not in games.keys():
+        # if there are keys and if the requested key doesn't match, throw an exception
+        raise HTTPException(status_code=HttpEnum.not_found, detail="unknown game key")
+    else:
+        currentGame = games[key]
+
+    logger.debug("Forming a chat message")
+    currentGame.chat.append(f"{get_time()} - {player}: {message}")
+    return {"Response": f"{get_time()} - {player}: {message}"}
+
+
 
 @app.post("/map", status_code=200)
 async def getMap() -> dict:
