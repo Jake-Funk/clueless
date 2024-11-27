@@ -16,7 +16,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
-  SidebarContent,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -96,7 +95,9 @@ export function NavMain() {
                     {gameContext.gameState.logs?.map((subItem: string) => (
                       <SidebarMenuSubItem key={subItem}>
                         <SidebarMenuSubButton asChild>
-                          <span className="block whitespace-pre-wrap break-words w-full h-full">{subItem}</span>
+                          <span className="block whitespace-pre-wrap break-words w-full h-full">
+                            {subItem}
+                          </span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
