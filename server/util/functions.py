@@ -4,7 +4,13 @@ from util.game_state import GameState
 
 
 def get_time() -> str:
-    return str(datetime.datetime.now().time())
+    """
+    Function to return the current hour:min:sec as a string
+    """
+    time = str(datetime.datetime.now().time())
+    time_list = time.split(".")
+    # Index 0 holds hour, minute and second, index 1 holds milliseconds
+    return str(time_list[0])
 
 
 def location_str(location: RoomEnum | HallEnum) -> str:

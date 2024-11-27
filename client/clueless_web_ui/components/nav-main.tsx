@@ -74,6 +74,7 @@ export function NavMain() {
 
     try {
       const response = await sendMessage(gameContext.gameID, gameContext.player, inputValue);  // Use the external send function
+      gameContext.setTrigger(gameContext.trigger + 1);
       console.log('Response:', response);
       // Optionally update the UI with the response or handle success.
 
@@ -146,7 +147,7 @@ export function NavMain() {
                     {gameContext.gameState.logs?.map((subItem: string) => (
                       <SidebarMenuSubItem key={subItem}>
                         <SidebarMenuSubButton asChild>
-                          <span className="block whitespace-pre-wrap break-words w-full h-full">{subItem}</span>
+                          <span className="block whitespace-pre-wrap break-words w-full h-full mb-1">{subItem}</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -175,33 +176,31 @@ export function NavMain() {
                 </SidebarMenuAction>
               </CollapsibleTrigger>
               <CollapsibleContent>
-                <SidebarMenuSub>
+                <SidebarMenuSub className="max-h-72 overflow-y-auto mb-4">
                   {gameContext.gameState.chat?.map((subItem: string) => (
                     <SidebarMenuSubItem key={subItem}>
                       <SidebarMenuSubButton asChild>
-                        <span>{subItem}</span>
+                        <span className="block whitespace-pre-wrap break-words w-full h-full mb-1">{subItem}</span>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}
-                  {!gameContext.gameState.logs && (
+                  {!gameContext.gameState.chat && (
                     <span className="p-4">There are no messages.</span>
                   )}
                 </SidebarMenuSub>
-                <div className="flex items-center gap-2 px-6">
+                <div className="flex items-center gap-2 px-6 mb-4">
                   <Input 
                     type="text"
                     className="input-class"
                     value={inputValue}
                     onChange={handleInputChange}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSendClick();
+                      }
+                    }}
                     placeholder="Enter message"
                   />
-                   <button
-                    className="cursor-pointer hover:text-sidebar-primary"
-                    onClick={handleSendClick}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Sending...' : 'Send'}
-                  </button>
                   {error && <div className="text-red-500">{error}</div>}
                 </div>
               </CollapsibleContent>
