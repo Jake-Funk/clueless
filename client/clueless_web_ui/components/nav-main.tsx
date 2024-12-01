@@ -119,6 +119,41 @@ export function NavMain() {
           </SidebarMenuItem>
         </Collapsible>
 
+        {/* Cards Disproved Section */}
+        <Collapsible asChild>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip={"Cards Disproved"}>
+              <div>
+                <FileStack />
+                <span className="cursor-default select-none">Cards Disproved</span>
+              </div>
+            </SidebarMenuButton>
+            {gameContext.gameState[gameContext.player]?.length ? (
+              <>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuAction className="data-[state=open]:rotate-90">
+                    <ChevronRight />
+                    <span className="sr-only">Toggle</span>
+                  </SidebarMenuAction>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {gameContext.gameState.playerHasSeen[gameContext.player]?.map(
+                      (subItem: string) => (
+                        <SidebarMenuSubItem key={subItem}>
+                          <SidebarMenuSubButton asChild>
+                            <span>{subItem}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ),
+                    )}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </>
+            ) : null}
+          </SidebarMenuItem>
+        </Collapsible>
+
         {/* Game log section */}
         <Collapsible asChild>
           <SidebarMenuItem>
