@@ -1,5 +1,6 @@
 from enum import Enum
 from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum, EndGameEnum
+from util.game_map import MAP
 from typing import Dict
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,78 +13,6 @@ STARTING_LOCATIONS = {
     PlayerEnum.mr_green: HallEnum.conservatory_to_ballroom,
     PlayerEnum.mrs_peacock: HallEnum.lib_to_conservatory,
     PlayerEnum.prof_plum: HallEnum.study_to_lib,
-}
-
-Map = {
-    RoomEnum.study: frozenset(
-        [HallEnum.study_to_hall, HallEnum.study_to_lib, RoomEnum.kitchen]
-    ),
-    RoomEnum.hall: frozenset(
-        [HallEnum.study_to_hall, HallEnum.hall_to_billiard, HallEnum.hall_to_lounge]
-    ),
-    RoomEnum.lounge: frozenset(
-        [HallEnum.hall_to_lounge, HallEnum.lounge_to_dining, RoomEnum.conservatory]
-    ),
-    RoomEnum.library: frozenset(
-        [HallEnum.study_to_lib, HallEnum.lib_to_billiard, HallEnum.lib_to_conservatory]
-    ),
-    RoomEnum.billiard: frozenset(
-        [
-            HallEnum.lib_to_billiard,
-            HallEnum.hall_to_billiard,
-            HallEnum.billiard_to_dining,
-            HallEnum.billiard_to_ballroom,
-        ]
-    ),
-    RoomEnum.dining: frozenset(
-        [
-            HallEnum.lounge_to_dining,
-            HallEnum.billiard_to_dining,
-            HallEnum.dining_to_kitchen,
-        ]
-    ),
-    RoomEnum.conservatory: frozenset(
-        [
-            HallEnum.lib_to_conservatory,
-            HallEnum.conservatory_to_ballroom,
-            RoomEnum.lounge,
-        ]
-    ),
-    RoomEnum.ballroom: frozenset(
-        [
-            HallEnum.conservatory_to_ballroom,
-            HallEnum.billiard_to_ballroom,
-            HallEnum.ballroom_to_kitchen,
-        ]
-    ),
-    RoomEnum.kitchen: frozenset(
-        [HallEnum.ballroom_to_kitchen, HallEnum.dining_to_kitchen, RoomEnum.study]
-    ),
-    HallEnum.study_to_hall: frozenset([RoomEnum.study, RoomEnum.hall]),
-    HallEnum.hall_to_lounge: frozenset([RoomEnum.hall, RoomEnum.lounge]),
-    HallEnum.study_to_lib: frozenset([RoomEnum.study, RoomEnum.library]),
-    HallEnum.hall_to_billiard: frozenset([RoomEnum.hall, RoomEnum.billiard]),
-    HallEnum.lounge_to_dining: frozenset([RoomEnum.lounge, RoomEnum.dining]),
-    HallEnum.lib_to_billiard: frozenset([RoomEnum.library, RoomEnum.billiard]),
-    HallEnum.billiard_to_dining: frozenset([RoomEnum.billiard, RoomEnum.dining]),
-    HallEnum.lib_to_conservatory: frozenset([RoomEnum.library, RoomEnum.conservatory]),
-    HallEnum.billiard_to_ballroom: frozenset([RoomEnum.billiard, RoomEnum.ballroom]),
-    HallEnum.dining_to_kitchen: frozenset([RoomEnum.dining, RoomEnum.kitchen]),
-    HallEnum.conservatory_to_ballroom: frozenset(
-        [RoomEnum.conservatory, RoomEnum.ballroom]
-    ),
-    HallEnum.ballroom_to_kitchen: frozenset([RoomEnum.ballroom, RoomEnum.kitchen]),
-    # Staging room holds characters not assigned to players
-    RoomEnum.staging: frozenset(
-        [
-            HallEnum.hall_to_lounge,
-            HallEnum.lounge_to_dining,
-            HallEnum.ballroom_to_kitchen,
-            HallEnum.conservatory_to_ballroom,
-            HallEnum.lib_to_conservatory,
-            HallEnum.study_to_lib,
-        ]
-    ),
 }
 
 
@@ -341,7 +270,7 @@ class GameState:
 
             hall_count = 0
             player_count = 0
-            for location in Map[current_location]:
+            for location in MAP[current_location]:
                 if type(location) is HallEnum:
                     hall_count += 1
                 if self.map[location]:
@@ -349,11 +278,11 @@ class GameState:
 
             # If the adjacent locations are not all Hallways there is a valid move
             # A secret Passageway counts as an adjacent room not hallway
-            if hall_count != len(Map[current_location]):
+            if hall_count != len(MAP[current_location]):
                 self.current_turn.phase = "move"
             # Otherwise check if all adjacent hallways are occupied
             else:
-                if player_count != len(Map[current_location]):
+                if player_count != len(MAP[current_location]):
                     self.current_turn.phase = "move"
                 else:
                     self.current_turn.phase = "accuse"

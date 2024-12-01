@@ -1,6 +1,7 @@
-from util.game_state import GameState, Map
+from util.game_state import GameState
 from util.enums import PlayerEnum, RoomEnum, HallEnum, HttpEnum
 from util.actions import MoveAction
+from util.game_map import MAP
 
 
 def move_player(
@@ -47,7 +48,7 @@ def validate_move(
         return (HttpEnum.bad_request, "Wrong phase of the game to perform a move.")
 
     # Check if desired location is adjacent to the current location
-    if movement.location not in Map[current_location]:
+    if movement.location not in MAP[current_location]:
         return (HttpEnum.bad_request, "Invalid location to move to.")
 
     # Check if desired location is a Hallway and if that hallway is occupied
@@ -70,7 +71,7 @@ def does_possible_move_exist(
     """
     hall_count = 0
     player_count = 0
-    for location in Map[current_location]:
+    for location in MAP[current_location]:
         if type(location) is HallEnum:
             hall_count += 1
         if gs.map[location]:
@@ -78,11 +79,11 @@ def does_possible_move_exist(
 
     # If the adjacent locations are not all Hallways return True
     # A secret Passageway counts as an adjacent room not hallway
-    if hall_count != len(Map[current_location]):
+    if hall_count != len(MAP[current_location]):
         return True
     # Otherwise check if all adjacent hallways are occupied
     else:
-        if player_count != len(Map[current_location]):
+        if player_count != len(MAP[current_location]):
             return True
         else:
             return False
