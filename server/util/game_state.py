@@ -1,5 +1,6 @@
 from enum import Enum
 from util.enums import PlayerEnum, RoomEnum, HallEnum, WeaponEnum, EndGameEnum
+from util.game_map import MAP
 from typing import Dict
 from dataclasses import dataclass
 from datetime import datetime
@@ -240,6 +241,56 @@ class GameState:
                 continue
             else:
                 break
+
+    def next_phase(self, desired_phase: str):
+        """
+        Moves the game phase to the next VALID phase of the game.
+        This function will skip the move phase if it is impossible at the current time.
+        (when the moving player is in a room where all adjacent hallways are full)
+
+        this function also assumes that the next_player function was called prior to this one
+        being called with "move" as its argument.
+        """
+
+        if desired_phase != "move":
+            self.current_turn.phase = desired_phase
+        else:
+            current_location = None
+            for location in self.map:
+                if (
+                    self.player_character_mapping[
+                        self.player_order[self.current_turn.player]
+                    ]
+                    in self.map[location]
+                ):
+                    current_location = location
+
+            if not current_location:
+                print(
+                    "Wat!? We couldn't find the player in the map. The server will probably implode now."
+                )
+
+            hall_count = 0
+            player_count = 0
+            for location in MAP[current_location]:
+                if type(location) is HallEnum:
+                    hall_count += 1
+                if self.map[location]:
+                    player_count += 1
+
+            # If the adjacent locations are not all Hallways there is a valid move
+            # A secret Passageway counts as an adjacent room not hallway
+            if hall_count != len(MAP[current_location]):
+                self.current_turn.phase = "move"
+            # Otherwise check if all adjacent hallways are occupied
+            else:
+                if player_count != len(MAP[current_location]):
+                    self.current_turn.phase = "move"
+                else:
+                    self.current_turn.phase = "accuse"
+                    self.logs.append(
+                        f"{self.current_turn.player} cannot make a valid move, skipping to accusation phase."
+                    )
 
     def get_current_player(self) -> PlayerEnum:
         """

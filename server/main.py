@@ -5,7 +5,7 @@ from util.game_state import GameState
 from util.enums import RoomEnum, HttpEnum, EndGameEnum
 from util.actions import ChatRequest, NewGameRequest, MoveAction, Statement
 from util.functions import get_character_location, get_time, location_str
-from util.movement import Map, move_player, validate_move, does_possible_move_exist
+from util.movement import move_player, validate_move
 import random
 
 import uuid
@@ -44,38 +44,6 @@ async def initialize_game(req: NewGameRequest) -> str:
     logger.debug(f"Creating Game State of ID: {key}")
     games[key] = temp
     return key
-
-
-@app.post("/valid-move", status_code=200)
-async def check_valid_move(gameKey: str, player: str):
-    """
-    Endpoint to throw an error code if the given player cannot make a move.
-    Assuming the game phase is on "move"
-    """
-    # Check if game exists
-    if gameKey == None or gameKey not in games.keys():
-        raise HTTPException(status_code=404, detail="Game not found.")
-
-    # Check if player can be found in the current map
-    try:
-        current_location = get_character_location(
-            games[gameKey].player_character_mapping[player], games[gameKey]
-        )
-    except Exception:
-        raise HTTPException(status_code=404, detail=f"{player} not found on Map.")
-
-    # Check if the player can make an action
-    if player not in games[gameKey].moveable_players:
-        logger.info(f"{player} cannot take actions, moving to next player")
-        games[gameKey].next_player()
-    elif (
-        not does_possible_move_exist(current_location, games[gameKey])
-        and player in games[gameKey].moveable_players
-    ):
-        logger.info(
-            f"{player} has no available move options, going to Accusation phase"
-        )
-        games[gameKey].current_turn.phase = "accuse"
 
 
 @app.post("/move")
@@ -118,12 +86,12 @@ async def move(movement: MoveAction):
         # If they have, move the game phase to suggestion
         # Otherwise keep the same phase but change players
         if isinstance(movement.location, RoomEnum):
-            games[key].current_turn.phase = "suggest"
+            games[key].next_phase("suggest")
             logging.info(f"Moving {movement.player} to {movement.location}")
             logging.info(f"{movement.player} can now make a suggestion")
         else:
             # Players in Hallways can still make Accusations
-            games[key].current_turn.phase = "accuse"
+            games[key].next_phase("accuse")
             logging.info(
                 f"{movement.player} moved to a Hallway, going to Accusation phase"
             )
@@ -189,7 +157,7 @@ async def makeAccusation(accusation: Statement):
         game.logs.append(f"{get_time()} - " + log_str)
         # Move game to the next player and the move phase
         game.next_player()
-        game.current_turn.phase = "move"
+        game.next_phase("move")
     else:
         game.logs.append(
             f"{get_time()} - {accusation.player} made an accusation of {accval.person.value} in {location_str(accval.room)} with the {accval.weapon.value}."
@@ -224,7 +192,7 @@ async def makeAccusation(accusation: Statement):
                 logging.info("No Players left to make correct accusations.")
                 logging.info("*****Game Over*****")
                 game.victory_state = EndGameEnum.no_winners
-            game.current_turn.phase = "move"
+            game.next_phase("move")
 
     return game.victory_state
 
@@ -398,7 +366,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
         )
 
     # change game turn phase
-    currentGame.current_turn.phase = "accuse"
+    currentGame.next_phase("accuse")
     return returnDict
 
 
@@ -417,17 +385,3 @@ async def formChat(chatReq: ChatRequest):
     logger.debug("Forming a chat message")
     currentGame.chat.append(f'{get_time()} - {chatReq.player}: "{chatReq.message}"')
     return {"Response": f'{get_time()} - {chatReq.player}: "{chatReq.message}"'}
-
-
-@app.post("/map", status_code=200)
-async def getMap() -> dict:
-    """
-    Endpoint to return the map so the client can provide only
-    the possible locations for movement.
-    """
-    try:
-        return Map
-    except Exception:
-        raise HTTPException(
-            status_code=HttpEnum.internal_error, detail="Map not found."
-        )
