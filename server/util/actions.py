@@ -7,6 +7,12 @@ import random
 from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum
 
 
+class ChatRequest(BaseModel):
+    key: str
+    player: str
+    message: str
+
+
 class NewGameRequest(BaseModel):
     num_players: int
 

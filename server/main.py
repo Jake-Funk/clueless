@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState
 from util.enums import RoomEnum, HttpEnum, EndGameEnum
-from util.actions import NewGameRequest, MoveAction, Statement
+from util.actions import ChatRequest, NewGameRequest, MoveAction, Statement
 from util.functions import get_character_location, get_time, location_str
 from util.movement import Map, move_player, validate_move, does_possible_move_exist
 import random
@@ -400,6 +400,23 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     # change game turn phase
     currentGame.current_turn.phase = "accuse"
     return returnDict
+
+
+@app.post("/chat", status_code=200)
+async def formChat(chatReq: ChatRequest):
+    """
+    Endpoint to form a chat message
+    """
+    # get the game state information
+    if chatReq.key not in games.keys():
+        # if there are keys and if the requested key doesn't match, throw an exception
+        raise HTTPException(status_code=HttpEnum.not_found, detail="unknown game key")
+    else:
+        currentGame = games[chatReq.key]
+
+    logger.debug("Forming a chat message")
+    currentGame.chat.append(f'{get_time()} - {chatReq.player}: "{chatReq.message}"')
+    return {"Response": f'{get_time()} - {chatReq.player}: "{chatReq.message}"'}
 
 
 @app.post("/map", status_code=200)
