@@ -151,6 +151,8 @@ class GameState:
 
         self.logs: list[GameEvent] = []
 
+        self.chat: list[str] = []
+
     def set_player_positions(self) -> None:
         """
         Utility function to set starting character positions
@@ -279,5 +281,6 @@ class GameState:
         outputDict["playerHasSeen"] = self.playerHasSeen
 
         outputDict["logs"] = reversed(self.logs)
+        outputDict["chat"] = reversed(self.chat)
 
         return outputDict
