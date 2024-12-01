@@ -266,7 +266,9 @@ class GameState:
                     current_location = location
 
             if not current_location:
-                raise Exception("Wat!? We couldn't find the player in the map.")
+                print(
+                    "Wat!? We couldn't find the player in the map. The server will probably implode now."
+                )
 
             hall_count = 0
             player_count = 0
