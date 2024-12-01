@@ -7,7 +7,6 @@ import {
   FileStack,
   Logs,
   MessageCircle,
-  Send,
   SendToBack,
   Settings,
 } from "lucide-react";
@@ -58,7 +57,6 @@ export const sendMessage = async (gameID, player, message) => {
 export function NavMain() {
   const gameContext = useContext<any>(GameStateContext); // eslint-disable-line
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleInputChange = (e) => {
@@ -68,7 +66,6 @@ export function NavMain() {
   const handleSendClick = async () => {
     if (!inputValue) return;  // Prevent sending if input is empty
 
-    setIsLoading(true);
     setError(null);  // Reset previous errors
 
     try {
@@ -80,8 +77,6 @@ export function NavMain() {
     } catch (err) {
       setError('Error sending request');
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
