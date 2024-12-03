@@ -73,15 +73,19 @@ export default function Home() {
                   </div>
                 ) : (
                   <>
-                    <div>It is your turn.</div>
-                    {currPhase == "move" && <MoveBtn />}
-                    {currPhase == "suggest" && <SuggestBtn />}
-                    {currPhase == "accuse" && (
+                    {gameState.moved_by_suggest["Miss Scarlet"] === false ? (
                       <>
-                        <div>Do you want to make an accusation?</div>
-                        <AccuseBtn />
-                      </>
-                    )}
+                      <div>It is your turn.</div>
+                      {currPhase == "move" && <MoveBtn />}
+                      {currPhase == "suggest" && <SuggestBtn />}
+                      {currPhase == "accuse" && (
+                        <>
+                          <div>Do you want to make an accusation?</div>
+                          <AccuseBtn />
+                        </>
+                      )}
+                    </>
+                  ) : null}
                   </>
                 )}
               </div>
