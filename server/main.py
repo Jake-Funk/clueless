@@ -3,7 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState
 from util.enums import RoomEnum, HttpEnum, EndGameEnum
-from util.actions import ChatRequest, NewGameRequest, MoveAction, Statement
+from util.actions import (
+    PhaseRequest,
+    ChatRequest,
+    NewGameRequest,
+    MoveAction,
+    Statement,
+)
 from util.functions import get_character_location, get_time, location_str
 from util.movement import move_player, validate_move
 import random
@@ -261,7 +267,10 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             status_code=HttpEnum.not_found, detail="Suggestor is unknown to the game"
         )
 
-    if currentGame.current_turn.phase != "suggest":
+    if (
+        currentGame.current_turn.phase != "suggest"
+        or currentGame.moved_by_suggest[playersCharacter]
+    ):
         raise HTTPException(
             status_code=HttpEnum.bad_request,
             detail="Game phase not in the suggestion phase",
@@ -280,6 +289,13 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             status_code=HttpEnum.forbidden,
             detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made",
         )
+
+    logger.info(
+        f"{playerSuggestion.player} suggests {playerSuggestion.statementDetails.person} with the {playerSuggestion.statementDetails.weapon} in the {playerSuggestion.statementDetails.room}"
+    )
+    currentGame.logs.append(
+        f"{playerSuggestion.player} suggests {playerSuggestion.statementDetails.person.value} with the {playerSuggestion.statementDetails.weapon.value} in the {playerSuggestion.statementDetails.room.value}"
+    )
 
     # move the target player to the suggested room
     # get current room
@@ -385,3 +401,18 @@ async def formChat(chatReq: ChatRequest):
     logger.debug("Forming a chat message")
     currentGame.chat.append(f'{get_time()} - {chatReq.player}: "{chatReq.message}"')
     return {"Response": f'{get_time()} - {chatReq.player}: "{chatReq.message}"'}
+
+
+@app.post("/phase", status_code=200)
+async def go_to_next_phase(phaseReq: PhaseRequest):
+    """
+    Endpoint to move to the desired game phase and clear
+    the suggestion mark on the player
+    """
+    logger.info(
+        f"Moving to {phaseReq.phase} phase and clearing {phaseReq.player}'s suggestion mark"
+    )
+    games[phaseReq.key].reset_player_moved_by_suggest(
+        games[phaseReq.key].player_character_mapping[phaseReq.player]
+    )
+    games[phaseReq.key].next_phase(phaseReq.phase)

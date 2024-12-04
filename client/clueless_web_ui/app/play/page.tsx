@@ -1,4 +1,5 @@
 "use client";
+import { Button } from "@/components/ui/button";
 import AccuseBtn from "@/components/accuse-btn";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Board } from "@/components/board";
@@ -13,6 +14,28 @@ import {
 import { defaultGameState, GameStateContext, gsObj } from "@/lib/types";
 import { useEffect, useState } from "react";
 
+export const sendMessage = async (gameID, phase, player) => {
+  const response = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + `/phase`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      key: gameID,
+      phase: phase,
+      player: player
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Request failed');
+  }
+
+  const data = await response.json();
+  return data;  // Return the response data for further processing
+};
+
 export default function Home() {
   const [gameID, setGameId] = useState("");
   const [player, setPlayer] = useState("");
@@ -20,6 +43,7 @@ export default function Home() {
   const [gameState, setGameState] = useState(defaultGameState);
   const currPlayer: string = gameState.game_phase.player;
   const currPhase: string = gameState.game_phase.phase;
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const value = localStorage.getItem("gameID") || "";
@@ -50,6 +74,33 @@ export default function Home() {
     }
   }, [gameID, trigger]);
 
+  // Handle the player choosing to stay in
+  // the room they were moved to by an other
+  // player's suggestion
+  const handleYesClick = async () => { 
+    try {
+      const response = await sendMessage(gameID, "suggest", player);
+      setTrigger(trigger + 1);
+
+    } catch (err) {
+      setError('Error sending phase request');
+      console.error(err);
+    }
+  };
+
+  // Handle the player choosing to move as normal
+  // if they were moved by a sugggestion
+  const handleNoClick = async () => { 
+    try {
+      const response = await sendMessage(gameID, "move", player);
+      setTrigger(trigger + 1);
+
+    } catch (err) {
+      setError('Error sending phase request');
+      console.error(err);
+    }
+  };
+
   return (
     <GameStateContext.Provider
       value={{ gameState, player, gameID, trigger, setTrigger }}
@@ -73,7 +124,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <>
-                    {gameState.moved_by_suggest["Miss Scarlet"] === false ? (
+                    {gameState.moved_by_suggest[(gameState as gsObj).player_character_mapping[currPlayer]] === false ? (
                       <>
                       <div>It is your turn.</div>
                       {currPhase == "move" && <MoveBtn />}
@@ -85,7 +136,24 @@ export default function Home() {
                         </>
                       )}
                     </>
-                  ) : null}
+                  ) : (
+                    <div>
+                      <div>Make Suggestion in current room OR move as normal?</div>
+                      <Button 
+                        onClick={() => handleYesClick()} 
+                        variant="outline"
+                        className="mt-2 ml-32 mr-2"
+                      >
+                        Stay
+                      </Button>
+                      <Button 
+                        onClick={() => handleNoClick()} 
+                        variant="outline"
+                      >
+                        Move
+                      </Button>
+                    </div> 
+                  )}
                   </>
                 )}
               </div>

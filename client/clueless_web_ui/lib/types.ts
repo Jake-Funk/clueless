@@ -7,6 +7,7 @@ export const defaultGameState = {
   },
   victory_state: 0,
   player_character_mapping: {},
+  moved_by_suggest: {},
   map: {
     study: [],
     hall: [],
@@ -40,6 +41,9 @@ export interface gsObj {
   victory_state: number;
   player_character_mapping: {
     [key: string]: string;
+  };
+  moved_by_suggest: {
+    [key: string]: bool;
   };
   map: {
     [key: string | number]: string[] | string;
