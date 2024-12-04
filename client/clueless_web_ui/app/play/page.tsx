@@ -77,22 +77,9 @@ export default function Home() {
   // Handle the player choosing to stay in
   // the room they were moved to by an other
   // player's suggestion
-  const handleYesClick = async () => { 
+  const handleClick = async (phase: string) => { 
     try {
-      const response = await sendMessage(gameID, "suggest", player);
-      setTrigger(trigger + 1);
-
-    } catch (err) {
-      setError('Error sending phase request');
-      console.error(err);
-    }
-  };
-
-  // Handle the player choosing to move as normal
-  // if they were moved by a sugggestion
-  const handleNoClick = async () => { 
-    try {
-      const response = await sendMessage(gameID, "move", player);
+      const response = await sendMessage(gameID, phase, player);
       setTrigger(trigger + 1);
 
     } catch (err) {
@@ -140,14 +127,14 @@ export default function Home() {
                     <div>
                       <div>Make Suggestion in current room OR move as normal?</div>
                       <Button 
-                        onClick={() => handleYesClick()} 
+                        onClick={() => handleClick("suggest")} 
                         variant="outline"
                         className="mt-2 ml-32 mr-2"
                       >
                         Stay
                       </Button>
                       <Button 
-                        onClick={() => handleNoClick()} 
+                        onClick={() => handleClick("move")} 
                         variant="outline"
                       >
                         Move
