@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from util.game_state import GameState
 from util.enums import RoomEnum, HttpEnum, EndGameEnum
 from util.actions import (
-    PhaseRequest,
     ChatRequest,
     NewGameRequest,
     MoveAction,
