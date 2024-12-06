@@ -1,6 +1,6 @@
 "use client";
 
-import {useState } from 'react';
+import { useState } from "react";
 
 import {
   ChevronRight,
@@ -34,10 +34,10 @@ import { Input } from "./ui/input";
 
 export const sendMessage = async (gameID, player, message) => {
   const response = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + `/chat`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       key: gameID,
@@ -47,16 +47,16 @@ export const sendMessage = async (gameID, player, message) => {
   });
 
   if (!response.ok) {
-    throw new Error('Request failed');
+    throw new Error("Request failed");
   }
 
   const data = await response.json();
-  return data;  // Return the response data for further processing
+  return data; // Return the response data for further processing
 };
 
 export function NavMain() {
   const gameContext = useContext<any>(GameStateContext); // eslint-disable-line
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
   const [error, setError] = useState(null);
 
   const handleInputChange = (e) => {
@@ -64,18 +64,21 @@ export function NavMain() {
   };
 
   const handleSendClick = async () => {
-    if (!inputValue) return;  // Prevent sending if input is empty
+    if (!inputValue) return; // Prevent sending if input is empty
 
-    setError(null);  // Reset previous errors
+    setError(null); // Reset previous errors
 
     try {
-      const response = await sendMessage(gameContext.gameID, gameContext.player, inputValue);  // Use the external send function
+      const response = await sendMessage(
+        gameContext.gameID,
+        gameContext.player,
+        inputValue,
+      ); // Use the external send function
       gameContext.setTrigger(gameContext.trigger + 1);
-      console.log('Response:', response);
+      console.log("Response:", response);
       // Optionally update the UI with the response or handle success.
-
     } catch (err) {
-      setError('Error sending request');
+      setError("Error sending request");
       console.error(err);
     }
   };
@@ -125,7 +128,9 @@ export function NavMain() {
             <SidebarMenuButton asChild tooltip={"Cards Disproved"}>
               <div>
                 <FileStack />
-                <span className="cursor-default select-none">Cards Disproved</span>
+                <span className="cursor-default select-none">
+                  Cards Disproved
+                </span>
               </div>
             </SidebarMenuButton>
             {gameContext.gameState[gameContext.player]?.length ? (
@@ -138,15 +143,15 @@ export function NavMain() {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {gameContext.gameState.playerHasSeen[gameContext.player]?.map(
-                      (subItem: string) => (
-                        <SidebarMenuSubItem key={subItem}>
-                          <SidebarMenuSubButton asChild>
-                            <span>{subItem}</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ),
-                    )}
+                    {gameContext.gameState.playerHasSeen[
+                      gameContext.player
+                    ]?.map((subItem: string) => (
+                      <SidebarMenuSubItem key={subItem}>
+                        <SidebarMenuSubButton asChild>
+                          <span>{subItem}</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </>
@@ -218,13 +223,13 @@ export function NavMain() {
                   )}
                 </SidebarMenuSub>
                 <div className="flex items-center gap-2 px-6 mb-4">
-                  <Input 
+                  <Input
                     type="text"
                     className="input-class"
                     value={inputValue}
                     onChange={handleInputChange}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         handleSendClick();
                       }
                     }}

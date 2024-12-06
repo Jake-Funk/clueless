@@ -16,24 +16,24 @@ import { useEffect, useState } from "react";
 
 export const sendMessage = async (gameID, phase, player) => {
   const response = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + `/phase`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+      Accept: "application/json",
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       key: gameID,
       phase: phase,
-      player: player
+      player: player,
     }),
   });
 
   if (!response.ok) {
-    throw new Error('Request failed');
+    throw new Error("Request failed");
   }
 
   const data = await response.json();
-  return data;  // Return the response data for further processing
+  return data; // Return the response data for further processing
 };
 
 export default function Home() {
@@ -43,7 +43,6 @@ export default function Home() {
   const [gameState, setGameState] = useState(defaultGameState);
   const currPlayer: string = gameState.game_phase.player;
   const currPhase: string = gameState.game_phase.phase;
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const value = localStorage.getItem("gameID") || "";
@@ -77,13 +76,11 @@ export default function Home() {
   // Handle the player choosing to stay in
   // the room they were moved to by an other
   // player's suggestion
-  const handleClick = async (phase: string) => { 
+  const handleClick = async (phase: string) => {
     try {
-      const response = await sendMessage(gameID, phase, player);
+      await sendMessage(gameID, phase, player);
       setTrigger(trigger + 1);
-
     } catch (err) {
-      setError('Error sending phase request');
       console.error(err);
     }
   };
@@ -111,36 +108,40 @@ export default function Home() {
                   </div>
                 ) : (
                   <>
-                    {gameState.moved_by_suggest[(gameState as gsObj).player_character_mapping[currPlayer]] === false ? (
+                    {gameState.moved_by_suggest[
+                      (gameState as gsObj).player_character_mapping[currPlayer]
+                    ] === false ? (
                       <>
-                      <div>It is your turn.</div>
-                      {currPhase == "move" && <MoveBtn />}
-                      {currPhase == "suggest" && <SuggestBtn />}
-                      {currPhase == "accuse" && (
-                        <>
-                          <div>Do you want to make an accusation?</div>
-                          <AccuseBtn />
-                        </>
-                      )}
-                    </>
-                  ) : (
-                    <div>
-                      <div>Make Suggestion in current room OR move as normal?</div>
-                      <Button 
-                        onClick={() => handleClick("suggest")} 
-                        variant="outline"
-                        className="mt-2 ml-32 mr-2"
-                      >
-                        Stay
-                      </Button>
-                      <Button 
-                        onClick={() => handleClick("move")} 
-                        variant="outline"
-                      >
-                        Move
-                      </Button>
-                    </div> 
-                  )}
+                        <div>It is your turn.</div>
+                        {currPhase == "move" && <MoveBtn />}
+                        {currPhase == "suggest" && <SuggestBtn />}
+                        {currPhase == "accuse" && (
+                          <>
+                            <div>Do you want to make an accusation?</div>
+                            <AccuseBtn />
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <div>
+                        <div>
+                          Make Suggestion in current room OR move as normal?
+                        </div>
+                        <Button
+                          onClick={() => handleClick("suggest")}
+                          variant="outline"
+                          className="mt-2 ml-32 mr-2"
+                        >
+                          Stay
+                        </Button>
+                        <Button
+                          onClick={() => handleClick("move")}
+                          variant="outline"
+                        >
+                          Move
+                        </Button>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
