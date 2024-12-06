@@ -113,6 +113,7 @@ export default function Home() {
                   </div>
                 ) : (
                   <>
+                    <div>It is your turn.</div>
                     {userAnswer == "suggest" && <SuggestBtn />}
                     {userAnswer == "move" && (
                       <>
