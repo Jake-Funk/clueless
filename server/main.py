@@ -291,10 +291,10 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
         )
 
     logger.info(
-        f"{playerSuggestion.player} suggests {playerSuggestion.statementDetails.person} with the {playerSuggestion.statementDetails.weapon} in the {playerSuggestion.statementDetails.room}"
+        f"{currentGame.player_username_mapping[playerSuggestion.player]} suggests {playerSuggestion.statementDetails.person} with the {playerSuggestion.statementDetails.weapon} in the {playerSuggestion.statementDetails.room}"
     )
     currentGame.logs.append(
-        f"{playerSuggestion.player} suggests {playerSuggestion.statementDetails.person.value} with the {playerSuggestion.statementDetails.weapon.value} in the {playerSuggestion.statementDetails.room.value}"
+        f"{currentGame.player_username_mapping[playerSuggestion.player]} suggests {playerSuggestion.statementDetails.person.value} with the {playerSuggestion.statementDetails.weapon.value} in the {playerSuggestion.statementDetails.room.value}"
     )
 
     # move the target player to the suggested room
