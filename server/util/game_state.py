@@ -333,5 +333,6 @@ class GameState:
 
         outputDict["logs"] = reversed(self.logs)
         outputDict["chat"] = reversed(self.chat)
+        outputDict["moved_by_suggest"] = self.moved_by_suggest
 
         return outputDict

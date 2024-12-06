@@ -3,7 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from util.game_state import GameState
 from util.enums import RoomEnum, HttpEnum, EndGameEnum
-from util.actions import ChatRequest, NewGameRequest, MoveAction, Statement
+from util.actions import (
+    ChatRequest,
+    NewGameRequest,
+    MoveAction,
+    Statement,
+)
 from util.functions import get_character_location, get_time, location_str
 from util.movement import move_player, validate_move
 import random
@@ -261,7 +266,10 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             status_code=HttpEnum.not_found, detail="Suggestor is unknown to the game"
         )
 
-    if currentGame.current_turn.phase != "suggest":
+    if (
+        currentGame.current_turn.phase != "suggest"
+        and not currentGame.moved_by_suggest[playersCharacter]
+    ):
         raise HTTPException(
             status_code=HttpEnum.bad_request,
             detail="Game phase not in the suggestion phase",
@@ -280,6 +288,13 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             status_code=HttpEnum.forbidden,
             detail="Suggestor is unable to make this suggestion -- suggestor is not in the room where the suggestion is being made",
         )
+
+    logger.info(
+        f"{playerSuggestion.player} suggests {playerSuggestion.statementDetails.person} with the {playerSuggestion.statementDetails.weapon} in the {playerSuggestion.statementDetails.room}"
+    )
+    currentGame.logs.append(
+        f"{playerSuggestion.player} suggests {playerSuggestion.statementDetails.person.value} with the {playerSuggestion.statementDetails.weapon.value} in the {playerSuggestion.statementDetails.room.value}"
+    )
 
     # move the target player to the suggested room
     # get current room
