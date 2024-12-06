@@ -70,7 +70,7 @@ export default function Home() {
                 {currPlayer != player ? ( // someone else's turn
                   <div>
                     It is{" "}
-                    {(gameState as gsObj).player_character_mapping[currPlayer]}
+                    {(gameState as gsObj).player_username_mapping[currPlayer]}
                     &apos;s turn.
                   </div>
                 ) : // your turn and not marked as moved

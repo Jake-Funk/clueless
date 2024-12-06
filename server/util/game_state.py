@@ -106,9 +106,9 @@ class GameState:
         self.player_clues: list[list[str]] = [[] for _ in range(num_players)]
         self.current_turn: GameTurn = GameTurn()
 
-        # TODO: This will need an update to proper player IDs
         self.moveable_players = []  # For tracking what players can still play
         self.player_order = []  # For tracking player order
+        self.player_username_mapping = {}
 
         # Mapping player ids to game characters
         self.player_character_mapping: Dict[str, PlayerEnum] = (
@@ -129,6 +129,7 @@ class GameState:
 
             self.moveable_players.append(player_id)
             self.player_order.append(player_id)
+            self.player_username_mapping[player_id] = ""
 
         self.map: Dict[RoomEnum | HallEnum, list[PlayerEnum]] = {}
         for item in list(RoomEnum) + list(HallEnum):
@@ -312,6 +313,7 @@ class GameState:
 
         outputDict["player_character_mapping"] = self.player_character_mapping
         outputDict["moved_by_suggest"] = self.moved_by_suggest
+        outputDict["player_username_mapping"] = self.player_username_mapping
 
         outputDict["victory_state"] = self.victory_state
 

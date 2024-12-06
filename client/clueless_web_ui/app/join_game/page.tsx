@@ -20,11 +20,36 @@ const formSchema = z.object({
   id: z.coerce.string().uuid("Not a valid game ID"),
 });
 
+const usernameFormSchema = z.object({
+  username: z.coerce
+    .string()
+    .min(1, { message: "Must have at least 1 character in your username" })
+    .max(20, { message: "Must be 20 or fewer characters long" }),
+});
+
+const defaultUsernameMap = {
+  player1: "",
+  player2: "",
+  player3: "",
+  player4: "",
+  player5: "",
+  player6: "",
+};
+
+interface usernameMap {
+  [key: string]: string;
+}
+
 export default function Home() {
   const router = useRouter();
   const [err, setErr] = useState(false);
   const [playerSelect, setPlayerSelect] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState("");
+  const [gameId, setGameId] = useState("");
+  const [usernameSet, setUsernameSet] = useState(false);
   const [playerOptions, setPlayerOptions] = useState<string[]>([]);
+  const [playerUsernameOptions, setPlayerUsernameOptions] =
+    useState<usernameMap>(defaultUsernameMap);
 
   function chosePlayer(player: string) {
     try {
@@ -35,10 +60,27 @@ export default function Home() {
     router.push("/play");
   }
 
+  function chosePlayerUnset(player: string) {
+    try {
+      localStorage.setItem("player", player);
+    } catch {
+      console.error("Problem adding data to local storage");
+    }
+    setSelectedPlayer(player);
+    setUsernameSet(true);
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       id: "",
+    },
+  });
+
+  const usernameForm = useForm<z.infer<typeof usernameFormSchema>>({
+    resolver: zodResolver(usernameFormSchema),
+    defaultValues: {
+      username: "",
     },
   });
 
@@ -60,11 +102,37 @@ export default function Home() {
       console.log(content);
       try {
         localStorage.setItem("gameID", values.id);
-        setPlayerSelect(true);
-        setPlayerOptions(Object.keys(content.player_character_mapping));
       } catch {
         console.error("Err adding the game ID to local storage");
       }
+      setPlayerSelect(true);
+      setPlayerOptions(Object.keys(content.player_character_mapping));
+      setPlayerUsernameOptions(content.player_username_mapping);
+      setGameId(values.id);
+    } else {
+      setErr(true);
+    }
+  }
+
+  async function onSubmitUsername(values: z.infer<typeof usernameFormSchema>) {
+    // ✅ This will be type-safe and validated.
+    const rawResp = await fetch(
+      process.env.NEXT_PUBLIC_SERVER_URL + `/username`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          game_id: gameId,
+          player: selectedPlayer,
+          username: values.username,
+        }),
+      },
+    );
+    if (rawResp.status == 200) {
+      router.push("/play");
     } else {
       setErr(true);
     }
@@ -114,26 +182,82 @@ export default function Home() {
             </form>
           </Form>
         </main>
-      ) : (
+      ) : !usernameSet ? (
         <main className="flex flex-col gap-8 row-start-2 items-center justify-center sm:items-start ">
           <div className="self-center font-bold text-xl">
             Who are you playing as?
           </div>
           <div className="flex flex-wrap gap-4 justify-center">
             {playerOptions.map((item) => {
-              return (
-                <Button
-                  key={item}
-                  className="basis-1/3"
-                  onClick={() => {
-                    chosePlayer(item);
-                  }}
-                >
-                  {item}
-                </Button>
-              );
+              if (playerUsernameOptions[item] == "") {
+                return (
+                  <Button
+                    key={item}
+                    className="basis-1/3"
+                    onClick={() => {
+                      chosePlayerUnset(item);
+                    }}
+                  >
+                    {item}
+                  </Button>
+                );
+              } else {
+                return (
+                  <Button
+                    key={item}
+                    className="basis-1/3"
+                    onClick={() => {
+                      chosePlayer(item);
+                    }}
+                  >
+                    {playerUsernameOptions[item]}
+                  </Button>
+                );
+              }
             })}
           </div>
+        </main>
+      ) : (
+        <main className="flex flex-col gap-8 row-start-2 items-center justify-center sm:items-start">
+          <div className="flex items-center gap-4">
+            <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
+              What would you like your username to be?
+            </h1>
+          </div>
+          <Form {...usernameForm}>
+            <form
+              onSubmit={usernameForm.handleSubmit(onSubmitUsername)}
+              className="flex flex-col m-auto"
+            >
+              <FormField
+                control={usernameForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="m-auto">Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        onFocus={() => {
+                          setErr(false);
+                        }}
+                      />
+                    </FormControl>
+                    {err ? (
+                      <FormMessage>
+                        This server encountered an error.
+                      </FormMessage>
+                    ) : (
+                      <FormMessage />
+                    )}
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="m-3">
+                Join Game
+              </Button>
+            </form>
+          </Form>
         </main>
       )}
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">

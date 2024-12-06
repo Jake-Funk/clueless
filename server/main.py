@@ -8,6 +8,7 @@ from util.actions import (
     NewGameRequest,
     MoveAction,
     Statement,
+    UsernameRequest,
 )
 from util.functions import get_character_location, get_time, location_str
 from util.movement import move_player, validate_move
@@ -102,7 +103,7 @@ async def move(movement: MoveAction):
             )
 
         games[key].logs.append(
-            f"{get_time()} - {movement.player} moved to {location_str(movement.location)}."
+            f"{get_time()} - {games[key].player_character_mapping[movement.player].value} moved to {location_str(movement.location)}."
         )
         return {
             "Response": f"Successfully moved {movement.player} to {movement.location.value}. Moving to next Player."
@@ -157,7 +158,7 @@ async def makeAccusation(accusation: Statement):
     # and move to the next player.
     accval = accusation.statementDetails
     if not (accval.person or accval.weapon or accval.room):
-        log_str = f"{accusation.player} opted to not make an accusation."
+        log_str = f"{game.player_username_mapping[accusation.player]} opted to not make an accusation."
         logger.info(log_str)
         game.logs.append(f"{get_time()} - " + log_str)
         # Move game to the next player and the move phase
@@ -165,7 +166,7 @@ async def makeAccusation(accusation: Statement):
         game.next_phase("move")
     else:
         game.logs.append(
-            f"{get_time()} - {accusation.player} made an accusation of {accval.person.value} in {location_str(accval.room)} with the {accval.weapon.value}."
+            f"{get_time()} - {game.player_username_mapping[accusation.player]} made an accusation of {accval.person.value} in {location_str(accval.room)} with the {accval.weapon.value}."
         )
         # If the accusation is correct, end the game
         if (
@@ -174,7 +175,7 @@ async def makeAccusation(accusation: Statement):
             and accval.room == game.solution.room
         ):
             game.logs.append(
-                f"{get_time()} - {accusation.player} uncovered all the Clues and won the game!"
+                f"{get_time()} - {game.player_username_mapping[accusation.player]} uncovered all the Clues and won the game!"
             )
             logging.info(
                 f"{accusation.player} correctly put together the Clues and won the game!"
@@ -186,7 +187,7 @@ async def makeAccusation(accusation: Statement):
         # Their only purpose is to disprove other suggestions.
         else:
             game.logs.append(
-                f"{get_time()} - {accusation.player}'s accusation was incorrect; they are now a spectator"
+                f"{get_time()} - {game.player_username_mapping[accusation.player]}'s accusation was incorrect; they are now a spectator"
             )
             logging.info(f"{accusation.player}'s accusation was not correct.")
             logging.info("They will remain to provide input on suggestions.")
@@ -363,10 +364,10 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             currentGame.playerHasSeen[suggestor].add(returnDict["response"])
 
             currentGame.logs.append(
-                f"{get_time()} - {suggestor}'s suggestion was disproved."
+                f"{get_time()} - {currentGame.player_username_mapping[suggestor]}'s suggestion was disproved."
             )
             logger.info(
-                f"{suggestor}'s suggestion had a card in an other player's hand."
+                f"{currentGame.player_username_mapping[suggestor]}'s suggestion had a card in an other player's hand."
             )
 
             # break loop immediately once an overlapping card is found
@@ -374,10 +375,10 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
             break
     if not found_card:
         currentGame.logs.append(
-            f"{get_time()} - {suggestor}'s suggestion was not disproved."
+            f"{get_time()} - {currentGame.player_username_mapping[suggestor]}'s suggestion was not disproved."
         )
         logger.info(
-            f"{suggestor}'s suggestion did NOT have a card in an other player's hand."
+            f"{currentGame.player_username_mapping[suggestor]}'s suggestion did NOT have a card in an other player's hand."
         )
 
     # change game turn phase
@@ -398,5 +399,32 @@ async def formChat(chatReq: ChatRequest):
         currentGame = games[chatReq.key]
 
     logger.debug("Forming a chat message")
-    currentGame.chat.append(f'{get_time()} - {chatReq.player}: "{chatReq.message}"')
-    return {"Response": f'{get_time()} - {chatReq.player}: "{chatReq.message}"'}
+    currentGame.chat.append(
+        f'{get_time()} - {currentGame.player_username_mapping[chatReq.player]}: "{chatReq.message}"'
+    )
+    return {
+        "Response": f'{get_time()} - {currentGame.player_username_mapping[chatReq.player]}: "{chatReq.message}"'
+    }
+
+
+@app.post("/username")
+async def pick_username(req: UsernameRequest):
+    if req.game_id not in games.keys():
+        raise HTTPException(status_code=HttpEnum.not_found, detail="unknown game ID")
+    else:
+        curr_game: GameState = games[req.game_id]
+
+    if not curr_game.player_username_mapping[req.player]:
+        print(curr_game.player_username_mapping[req.player])
+        curr_game.player_username_mapping[req.player] = req.username
+        curr_game.logs.append(
+            f'"{req.username}" has joined the game as {curr_game.player_character_mapping[req.player].value}'
+        )
+        logger.info(
+            f"{req.player} has joined game {req.game_id} with username: {req.username}"
+        )
+    else:
+        raise HTTPException(
+            status_code=HttpEnum.forbidden,
+            detail="Username already set for this player",
+        )
