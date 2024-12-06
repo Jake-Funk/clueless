@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import {
   ChevronRight,
@@ -32,7 +32,11 @@ import { GameStateContext } from "@/lib/types";
 
 import { Input } from "./ui/input";
 
-export const sendMessage = async (gameID, player, message) => {
+export const sendMessage = async (
+  gameID: string,
+  player: string,
+  message: string,
+) => {
   const response = await fetch(process.env.NEXT_PUBLIC_SERVER_URL + `/chat`, {
     method: "POST",
     headers: {
@@ -47,7 +51,7 @@ export const sendMessage = async (gameID, player, message) => {
   });
 
   if (!response.ok) {
-    throw new Error("Request failed");
+    console.error("Chat request failed");
   }
 
   const data = await response.json();
@@ -57,25 +61,20 @@ export const sendMessage = async (gameID, player, message) => {
 export function NavMain() {
   const gameContext = useContext<any>(GameStateContext); // eslint-disable-line
   const [inputValue, setInputValue] = useState("");
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
   const handleSendClick = async () => {
     if (!inputValue) return; // Prevent sending if input is empty
 
-    setError(null); // Reset previous errors
+    setError(""); // Reset previous errors
 
     try {
-      const response = await sendMessage(
-        gameContext.gameID,
-        gameContext.player,
-        inputValue,
-      ); // Use the external send function
+      await sendMessage(gameContext.gameID, gameContext.player, inputValue); // Use the external send function
       gameContext.setTrigger(gameContext.trigger + 1);
-      console.log("Response:", response);
       // Optionally update the UI with the response or handle success.
     } catch (err) {
       setError("Error sending request");
