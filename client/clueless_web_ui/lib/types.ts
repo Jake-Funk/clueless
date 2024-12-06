@@ -7,6 +7,7 @@ export const defaultGameState = {
   },
   victory_state: 0,
   player_character_mapping: {},
+  player_username_mapping: {},
   moved_by_suggest: {},
   map: {
     study: [],
@@ -40,6 +41,9 @@ export interface gsObj {
   };
   victory_state: number;
   player_character_mapping: {
+    [key: string]: string;
+  };
+  player_username_mapping: {
     [key: string]: string;
   };
   moved_by_suggest: {

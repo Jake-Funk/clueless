@@ -42,3 +42,9 @@ class MoveAction:
     player: str
     location: HallEnum | RoomEnum | None
     id: str | None = None
+
+
+class UsernameRequest(BaseModel):
+    game_id: str
+    player: str
+    username: str

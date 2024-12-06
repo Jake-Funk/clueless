@@ -73,7 +73,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
         <div>
           <div className="font-bold">
-            You are: <span className="font-normal">{player}</span>
+            You are:{" "}
+            <span className="font-normal">
+              {gameState.player_username_mapping[player]}
+            </span>
           </div>
           {player && (
             <div>

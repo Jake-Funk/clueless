@@ -21,6 +21,10 @@ const formSchema = z.object({
     .number()
     .min(2, { message: "You need at least 2 people to play" })
     .max(6, { message: "You can only play with up to 6 players." }),
+  username: z.coerce
+    .string()
+    .min(1, { message: "Must have at least 1 character for your username" })
+    .max(20, { message: "Must be 20 or fewer characters long" }),
 });
 
 export default function Home() {
@@ -31,6 +35,7 @@ export default function Home() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       numPlayers: 2,
+      username: "Player1",
     },
   });
 
@@ -50,14 +55,36 @@ export default function Home() {
     );
     const content = await rawResp.json();
 
-    console.log(content);
-    try {
-      localStorage.setItem("gameID", content);
-      localStorage.setItem("player", "player1");
-    } catch {
-      console.error("Err adding the game ID to local storage");
-    } finally {
-      router.push("/play");
+    if (rawResp.status == 200) {
+      console.log(content);
+      try {
+        localStorage.setItem("gameID", content);
+        localStorage.setItem("player", "player1");
+      } catch {
+        console.error("Err adding the game ID to local storage");
+      } finally {
+        const rawUsernameResp = await fetch(
+          process.env.NEXT_PUBLIC_SERVER_URL + `/username`,
+          {
+            method: "POST",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              game_id: content,
+              player: "player1",
+              username: values.username,
+            }),
+          },
+        );
+        if (rawUsernameResp.status == 200) {
+          router.push("/play");
+        } else {
+          console.error("A problem has occurred");
+        }
+        router.push("/play");
+      }
     }
 
     setIsLoading(false);
@@ -67,8 +94,9 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)] animate-in ease-in-out zoom-in-0 duration-1000">
       <main className="flex flex-col gap-8 row-start-2 items-center justify-center sm:items-start ">
         <div className="flex items-center gap-4">
-          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
-            How many people will be playing?
+          <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl text-center">
+            Tell us how many people are playing, and what you want your username
+            to be.
           </h1>
         </div>
         <Form {...form}>
@@ -84,6 +112,19 @@ export default function Home() {
                   <FormLabel className="m-auto">Number of Players</FormLabel>
                   <FormControl>
                     <Input {...field} type="number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="m-auto">Username</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

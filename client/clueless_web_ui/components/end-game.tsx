@@ -24,7 +24,7 @@ export default function EndGame() {
               <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
                 {player == gameState.game_phase.player
                   ? "You Won!"
-                  : `${gameState.game_phase.player} is the Winner!`}
+                  : `${gameState.player_username_mapping[gameState.game_phase.player]} is the Winner!`}
               </h1>
               <Search className={iconClasses} size={40} />
             </div>
