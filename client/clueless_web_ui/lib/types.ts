@@ -43,7 +43,7 @@ export interface gsObj {
     [key: string]: string;
   };
   moved_by_suggest: {
-    [key: string]: bool;
+    [key: string]: boolean;
   };
   map: {
     [key: string | number]: string[] | string;

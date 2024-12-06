@@ -269,7 +269,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
 
     if (
         currentGame.current_turn.phase != "suggest"
-        or currentGame.moved_by_suggest[playersCharacter]
+        and not currentGame.moved_by_suggest[playersCharacter]
     ):
         raise HTTPException(
             status_code=HttpEnum.bad_request,
@@ -401,18 +401,3 @@ async def formChat(chatReq: ChatRequest):
     logger.debug("Forming a chat message")
     currentGame.chat.append(f'{get_time()} - {chatReq.player}: "{chatReq.message}"')
     return {"Response": f'{get_time()} - {chatReq.player}: "{chatReq.message}"'}
-
-
-@app.post("/phase", status_code=200)
-async def go_to_next_phase(phaseReq: PhaseRequest):
-    """
-    Endpoint to move to the desired game phase and clear
-    the suggestion mark on the player
-    """
-    logger.info(
-        f"Moving to {phaseReq.phase} phase and clearing {phaseReq.player}'s suggestion mark"
-    )
-    games[phaseReq.key].reset_player_moved_by_suggest(
-        games[phaseReq.key].player_character_mapping[phaseReq.player]
-    )
-    games[phaseReq.key].next_phase(phaseReq.phase)
