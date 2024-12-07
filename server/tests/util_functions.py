@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from util.game_state import GameState
-from util.enums import PlayerEnum, WeaponEnum, HallEnum, RoomEnum, HttpEnum
+from util.enums import PlayerEnum, WeaponEnum, RoomEnum
 
 from main import app
 

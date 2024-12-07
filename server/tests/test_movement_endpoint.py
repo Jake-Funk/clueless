@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from util.functions import get_character_location
 from util.game_state import GameState
 from util.enums import PlayerEnum, HallEnum, RoomEnum, HttpEnum
-from util.movement import move_player, validate_move, does_possible_move_exist
+from util.movement import validate_move, does_possible_move_exist
 from tests.data.move_actions import MOVES
 from tests.util_functions import get_new_default_game_key
 import pytest

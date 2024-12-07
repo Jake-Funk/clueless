@@ -43,7 +43,7 @@ app.add_middleware(
 async def initialize_game(req: NewGameRequest) -> str:
     try:
         temp = GameState(req.num_players)
-    except:
+    except ValueError:
         raise HTTPException(status_code=403, detail="Invalid number of players.")
 
     key = str(uuid.uuid4())
@@ -60,7 +60,7 @@ async def move(movement: MoveAction):
     the action, the game id and the desired location to move to.
     """
     # Check if game exists
-    if movement.id == None or movement.id not in games.keys():
+    if movement.id is None or movement.id not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
     key = movement.id
 
@@ -69,7 +69,7 @@ async def move(movement: MoveAction):
         current_location = get_character_location(
             games[key].player_character_mapping[movement.player], games[key]
         )
-    except Exception:
+    except (ValueError, KeyError):
         raise HTTPException(status_code=404, detail="Player not found on Map.")
 
     # If the player's character is marked as having been moved by a suggestion,
@@ -144,7 +144,7 @@ async def makeAccusation(accusation: Statement):
     skipped.
     """
     # Check if game exists
-    if accusation.gameKey == None or accusation.gameKey not in games.keys():
+    if accusation.gameKey is None or accusation.gameKey not in games.keys():
         raise HTTPException(status_code=404, detail="Game not found.")
     game = games[accusation.gameKey]
 
@@ -180,7 +180,7 @@ async def makeAccusation(accusation: Statement):
             logging.info(
                 f"{accusation.player} correctly put together the Clues and won the game!"
             )
-            logging.info(f"*****Game Over*****")
+            logging.info("*****Game Over*****")
             game.victory_state = EndGameEnum.winner_found
         # Otherwise, the player can continue playing only as an observor to disprove
         # suggestions; i.e. they cannot move, make suggestions or accusations.
@@ -262,7 +262,7 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     try:
         # get the character represented by the current player
         playersCharacter = currentGameDict["player_character_mapping"][suggestor]
-    except:
+    except KeyError:
         raise HTTPException(
             status_code=HttpEnum.not_found, detail="Suggestor is unknown to the game"
         )

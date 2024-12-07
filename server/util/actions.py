@@ -1,10 +1,7 @@
-from enum import Enum, IntEnum
 from dataclasses import dataclass
-from fastapi import Header
 from pydantic import BaseModel
-import random
 
-from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum, HttpEnum
+from util.enums import HallEnum, RoomEnum, PlayerEnum, WeaponEnum
 
 
 class ChatRequest(BaseModel):

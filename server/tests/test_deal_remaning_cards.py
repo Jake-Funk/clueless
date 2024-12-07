@@ -1,4 +1,4 @@
-from util.game_state import GameState, GameSolution
+from util.game_state import GameState
 import pytest
 
 
@@ -8,7 +8,7 @@ def test_num_players(num_players: int):
 
     # if given invalid input the function should raise a ValueError
     with pytest.raises(ValueError):
-        hands = dummy_game.deal_remaining_cards(num_players)
+        dummy_game.deal_remaining_cards(num_players)
 
 
 @pytest.mark.parametrize("num_players", range(2, 7))
