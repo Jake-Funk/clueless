@@ -1,8 +1,6 @@
 from fastapi.testclient import TestClient
-from util.game_state import GameState
-from util.enums import PlayerEnum, WeaponEnum, HallEnum, RoomEnum, HttpEnum
+from util.enums import PlayerEnum, WeaponEnum, RoomEnum
 from tests.util_functions import get_new_default_game_key
-import pytest
 
 from main import app, games
 

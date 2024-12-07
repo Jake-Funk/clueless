@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 from util.functions import get_character_location
-from util.game_state import GameState
-from util.enums import PlayerEnum, WeaponEnum, HallEnum, RoomEnum, HttpEnum
-from util.movement import move_player, validate_move, does_possible_move_exist
-from tests.data.move_actions import MOVES
+from util.enums import PlayerEnum, WeaponEnum, RoomEnum
 from tests.util_functions import get_new_default_game_key, check_no_suggestion_return
-import pytest
 
 from main import app, games
 
@@ -36,7 +32,7 @@ def test_bad_key_suggest():
     """
     Test to check having no valid key returns a HTTP 400 message
     """
-    key = get_new_default_game_key(2)
+    get_new_default_game_key(2)
     response = client.post(
         "/suggestion/",
         json={

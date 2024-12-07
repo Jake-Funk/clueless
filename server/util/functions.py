@@ -37,4 +37,4 @@ def get_character_location(
     for location in gs.map:
         if character in gs.map[location]:
             return location
-    raise Exception("Character not found.", character)
+    raise ValueError("Character not found.", character)
