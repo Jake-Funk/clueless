@@ -29,6 +29,29 @@ export default function Home() {
 
     const playerNo = localStorage.getItem("player") || "";
     setPlayer(playerNo);
+
+    async function getGameState() {
+      const rawResp = await fetch(
+        process.env.NEXT_PUBLIC_SERVER_URL + `/State?gameKey=${value}`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const content = await rawResp.json();
+      console.log(content); // this is for development use only and should be removed for the target inc (probably)
+      setGameState(content);
+    }
+
+    const intervalID = setInterval(() => {
+      if (value) {
+        getGameState();
+      }
+    }, 5000);
+    return () => clearInterval(intervalID);
   }, []);
 
   useEffect(() => {
