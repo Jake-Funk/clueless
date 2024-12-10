@@ -29,7 +29,7 @@ const navSecondary = [
   },
   {
     title: "Github",
-    url: "#",
+    url: "https://github.com/Jake-Funk/clueless",
     icon: GithubIcon,
   },
 ];
