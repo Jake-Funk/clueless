@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 const navSecondary = [
   {
     title: "Rules",
-    url: "#",
+    url: "/Clue-Less.pdf",
     icon: BookMarked,
   },
   {
