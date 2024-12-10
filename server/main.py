@@ -322,7 +322,8 @@ async def makeSuggestion(playerSuggestion: Statement) -> dict:
     logger.info(
         f"{suggestion.person} is being marked as having been moved by suggestion"
     )
-    currentGame.set_player_moved_by_suggest(suggestion.person)
+    if suggestion.person != playersCharacter:
+        currentGame.set_player_moved_by_suggest(suggestion.person)
 
     # after move update the game state dictionary
     currentGameDict = currentGame.dump_to_dict()
